@@ -57,3 +57,11 @@ svg,img {
 	display: none;
 	flex:auto;
 }
+
+.player {
+	/*display: none;*/
+}
+
+#danmu_bar {
+	/*display: none;*/
+}

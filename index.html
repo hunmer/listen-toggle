@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Listen and Write</title>
+    <title>listen toggle</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy" content="block-all-mixed-content">
@@ -24,32 +24,11 @@
 </head>
 
 <body style="background-image: url(./img/background.jpg);background-size: cover;">
-    <!-- 复制 -->
-    <div class="modal fade text-center" tabindex="9999" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" id="modal_copy" style="z-index: 9999">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">コピー</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="clipboard_content">内容</label></br>
-                        <textarea id="clipboard_content" class="w-100"></textarea></br>
-                        <button id='clipboard' type="button" class="btn btn-primary" data-clipboard-target="#clipboard_content" onclick="$('#modal_copy').modal('hide')">コピー</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
     <div class="modal fade text-center" tabindex="9999" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" id="modal_music" style="z-index: 9999">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content  p-3">
                 <div class="modal-header">
-                    <h5 class="modal-title">音乐</h5>
+                    <h5 class="modal-title">音楽</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -57,9 +36,40 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <div class="row">
-                            <input class="col-10" style="width: 80%" type="text" id="input_music" placeholder="音乐名" value="猫" onkeydown="if(event.keyCode == 13) $('#btn_search_music')[0].click();">
-                            <button id="btn_search_music" onclick="search('music', $('#input_music').val())" class="btn btn-success col-2">搜索</button>
-                        </div>
+                            <input class="col-10" style="width: 80%" type="text" id="input_music" placeholder="名前" value="猫" onkeydown="if(event.keyCode == 13) $('#btn_search_music')[0].click();">
+                            <button id="btn_search_music" onclick="search('music', $('#input_music').val())" class="btn btn-success col-2">検索</button>
+                            <div class="checkbox_list">
+                            <div class="form-check form-check-inline">
+							  <input checked class="form-check-input" onchange="var b = this.checked;$(this).parents('.checkbox_list').find('input[type=checkbox]').prop('checked', b);" type="checkbox" id="check_all">
+							  <label class="form-check-label" for="check_all">all</label>
+							</div>
+							<div class="form-check form-check-inline">
+							  <input data-action="fitler_site" class="form-check-input" type="checkbox" id="check_netease" value="netease" checked>
+							  <label class="form-check-label" for="check_netease">netease</label>
+							</div>
+							<div class="form-check form-check-inline">
+							  <input data-action="fitler_site" class="form-check-input" type="checkbox" id="check_tencent" value="tencent" checked>
+							  <label class="form-check-label" for="check_tencent">tencent</label>
+							</div>
+							<div class="form-check form-check-inline">
+							  <input data-action="fitler_site" class="form-check-input" type="checkbox" id="check_xiami" value="xiami" checked>
+							  <label class="form-check-label" for="check_xiami">xiami</label>
+							</div>
+							<div class="form-check form-check-inline">
+							  <input data-action="fitler_site"  class="form-check-input" type="checkbox" id="check_youtube" value="youtube" checked>
+							  <label class="form-check-label" for="check_youtube">youtube</label>
+							</div>
+							<div class="form-check form-check-inline">
+							  <input data-action="fitler_site" class="form-check-input" type="checkbox" id="check_kugou" value="kugou" checked>
+							  <label class="form-check-label" for="check_kugou">kugou</label>
+							</div>
+							<div class="form-check form-check-inline">
+							  <input data-action="fitler_site" class="form-check-input" type="checkbox" id="check_baidu" value="baidu" checked>
+							  <label class="form-check-label" for="check_baidu">baidu</label>
+							</div>
+
+							</div>
+				                        </div>
                         <div class="row" id="list_music">
                             <ul class="list-group list-group-flush">
                             </ul>
@@ -71,9 +81,9 @@
     </div>
     <div class="modal fade text-center" tabindex="9999" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" id="modal_video" style="z-index: 9999">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content p-3">
                 <div class="modal-header">
-                    <h5 class="modal-title">视频</h5>
+                    <h5 class="modal-title">動画</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -81,8 +91,8 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <div class="row">
-                            <input class="col-10" style="width: 80%" type="text" id="input_video" placeholder="视频名" value="猫" onkeydown="if(event.keyCode == 13) $('#btn_search_music')[0].click();">
-                            <button id="btn_search_music" onclick="search('video', $('#input_video').val())" class="btn btn-success col-2">搜索</button>
+                            <input class="col-10" style="width: 80%" type="text" id="input_video" placeholder="名前" value="猫" onkeydown="if(event.keyCode == 13) $('#btn_search_music')[0].click();">
+                            <button id="btn_search_music" onclick="search('video', $('#input_video').val())" class="btn btn-success col-2">検索</button>
                         </div>
                         <div class="row" id="list_video">
                             <ul class="list-group list-group-flush">
@@ -93,11 +103,12 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade text-center" tabindex="9999" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" id="modal_link" style="z-index: 9999">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">链接</h5>
+                    <h5 class="modal-title">リンク</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -110,8 +121,8 @@
 							  <option value="audio">Audio</option>
 							  <option value="image">Image</option>
 							</select>
-                            <input class="col-8" style="width: 80%" type="text" id="input_link" placeholder="..." value="https://photovideo.photo.qq.com/1075_0b535uaasaaayaacgrathjpdh3iebhwqacka.f20.mp4?dis_k=694be9ffd76639424b6fa068e35893ab&dis_t=1613267128">
-                            <button id="btn_share_link" onclick="shareLink()" class="btn btn-success col-2">发送</button>
+                            <input class="col-8" style="width: 80%" type="text" id="input_link" placeholder="..." value="https://1251316161.vod2.myqcloud.com/007a649dvodcq1251316161/23660bf95285890806444861886/0akkd57pzpcA.mp4">
+                            <button id="btn_share_link" onclick="shareLink()" class="btn btn-success col-2">発信</button>
 
                             <div class="mt-3 col-12">
 							  <label for="input_name" class="form-label">Title</label>
@@ -149,7 +160,7 @@
             </div>
         </div>
     </div>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light ">
         <a class="navbar-brand" href="#"><img class="round mr-2" src="./img/default.png" width="30px" height="30px">
             <span class="badge badge-secondary">...</span>
         </a>
@@ -195,11 +206,11 @@
     	 <div class="cover_list row p-2">
             <div class="col-2 text-center" data-action="selectUser" data-user="maki">
                  <img style="border-radius: 50%;" src='img/maki.jpg' width="45" height="45">
-                <span class="badge bg-secondary">离线</span>
+                <span class="badge bg-secondary">offline</span>
             </div>
             <div class="col-2" data-action="selectUser" data-user="chisato">
                  <img style="border-radius: 50%;" src='img/chisato.jpg' width="45" height="45">
-                <span class="badge bg-secondary">离线</span>
+                <span class="badge bg-secondary">offline</span>
             </div>
         </div>
 
@@ -210,27 +221,27 @@
                 <img id="music_cover" class="lazyload" src='img/maki.jpg' width="70" height="70">
             </div>
             <div class="col-10 text-center">
-                <span id="music_name">歌名/歌手</span><hr style="margin: 0">
-                <span id="music_lyric">歌词</span></br>
+                <span id="music_name"></span><hr style="margin: 0">
+                <span id="music_lyric"></span></br>
             </div>
-            <div class="col-8 progress pl-0 ml-3 mt-1">
+            <div class="col-7 progress pl-0 ml-3 mt-2">
 		  <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
 		</div>
-            <div class="col text-center">
+            <div class="col-auto text-center">
             	  <svg data-action="volume" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-volume-up-fill" viewBox="0 0 16 16">
   <path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
   <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/>
   <path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
 </svg>
-          <svg data-action="up" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-hand-thumbs-up" viewBox="0 0 16 16">
-  <path d="M8.864.046C7.908-.193 7.02.53 6.956 1.466c-.072 1.051-.23 2.016-.428 2.59-.125.36-.479 1.013-1.04 1.639-.557.623-1.282 1.178-2.131 1.41C2.685 7.288 2 7.87 2 8.72v4.001c0 .845.682 1.464 1.448 1.545 1.07.114 1.564.415 2.068.723l.048.03c.272.165.578.348.97.484.397.136.861.217 1.466.217h3.5c.937 0 1.599-.477 1.934-1.064a1.86 1.86 0 0 0 .254-.912c0-.152-.023-.312-.077-.464.201-.263.38-.578.488-.901.11-.33.172-.762.004-1.149.069-.13.12-.269.159-.403.077-.27.113-.568.113-.857 0-.288-.036-.585-.113-.856a2.144 2.144 0 0 0-.138-.362 1.9 1.9 0 0 0 .234-1.734c-.206-.592-.682-1.1-1.2-1.272-.847-.282-1.803-.276-2.516-.211a9.84 9.84 0 0 0-.443.05 9.365 9.365 0 0 0-.062-4.509A1.38 1.38 0 0 0 9.125.111L8.864.046zM11.5 14.721H8c-.51 0-.863-.069-1.14-.164-.281-.097-.506-.228-.776-.393l-.04-.024c-.555-.339-1.198-.731-2.49-.868-.333-.036-.554-.29-.554-.55V8.72c0-.254.226-.543.62-.65 1.095-.3 1.977-.996 2.614-1.708.635-.71 1.064-1.475 1.238-1.978.243-.7.407-1.768.482-2.85.025-.362.36-.594.667-.518l.262.066c.16.04.258.143.288.255a8.34 8.34 0 0 1-.145 4.725.5.5 0 0 0 .595.644l.003-.001.014-.003.058-.014a8.908 8.908 0 0 1 1.036-.157c.663-.06 1.457-.054 2.11.164.175.058.45.3.57.65.107.308.087.67-.266 1.022l-.353.353.353.354c.043.043.105.141.154.315.048.167.075.37.075.581 0 .212-.027.414-.075.582-.05.174-.111.272-.154.315l-.353.353.353.354c.047.047.109.177.005.488a2.224 2.224 0 0 1-.505.805l-.353.353.353.354c.006.005.041.05.041.17a.866.866 0 0 1-.121.416c-.165.288-.503.56-1.066.56z"/>
+          <svg data-action="up" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-hand-thumbs-up-fill" viewBox="0 0 16 16">
+  <path d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.964.22.817.533 2.512.062 4.51a9.84 9.84 0 0 1 .443-.05c.713-.065 1.669-.072 2.516.21.518.173.994.68 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.162 3.162 0 0 1-.488.9c.054.153.076.313.076.465 0 .306-.089.626-.253.912C13.1 15.522 12.437 16 11.5 16H8c-.605 0-1.07-.081-1.466-.218a4.826 4.826 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.616.849-.231 1.574-.786 2.132-1.41.56-.626.914-1.279 1.039-1.638.199-.575.356-1.54.428-2.59z"/>
+</svg>
+<svg data-action="down" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-hand-thumbs-down-fill" viewBox="0 0 16 16">
+  <path d="M6.956 14.534c.065.936.952 1.659 1.908 1.42l.261-.065a1.378 1.378 0 0 0 1.012-.965c.22-.816.533-2.512.062-4.51.136.02.285.037.443.051.713.065 1.669.071 2.516-.211.518-.173.994-.68 1.2-1.272a1.896 1.896 0 0 0-.234-1.734c.058-.118.103-.242.138-.362.077-.27.113-.568.113-.856 0-.29-.036-.586-.113-.857a2.094 2.094 0 0 0-.16-.403c.169-.387.107-.82-.003-1.149a3.162 3.162 0 0 0-.488-.9c.054-.153.076-.313.076-.465a1.86 1.86 0 0 0-.253-.912C13.1.757 12.437.28 11.5.28H8c-.605 0-1.07.08-1.466.217a4.823 4.823 0 0 0-.97.485l-.048.029c-.504.308-.999.61-2.068.723C2.682 1.815 2 2.434 2 3.279v4c0 .851.685 1.433 1.357 1.616.849.232 1.574.787 2.132 1.41.56.626.914 1.28 1.039 1.638.199.575.356 1.54.428 2.591z"/>
 </svg>
             <svg xmlns="http://www.w3.org/2000/svg" data-action="switch" width="20" height="20" fill="currentColor" class="bi bi-stop-circle-fill" viewBox="0 0 16 16">
                 <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5h-3z" />
             </svg>
-            <svg data-action="down" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-hand-thumbs-down" viewBox="0 0 16 16">
-  <path d="M8.864 15.674c-.956.24-1.843-.484-1.908-1.42-.072-1.05-.23-2.015-.428-2.59-.125-.36-.479-1.012-1.04-1.638-.557-.624-1.282-1.179-2.131-1.41C2.685 8.432 2 7.85 2 7V3c0-.845.682-1.464 1.448-1.546 1.07-.113 1.564-.415 2.068-.723l.048-.029c.272-.166.578-.349.97-.484C6.931.08 7.395 0 8 0h3.5c.937 0 1.599.478 1.934 1.064.164.287.254.607.254.913 0 .152-.023.312-.077.464.201.262.38.577.488.9.11.33.172.762.004 1.15.069.13.12.268.159.403.077.27.113.567.113.856 0 .289-.036.586-.113.856-.035.12-.08.244-.138.363.394.571.418 1.2.234 1.733-.206.592-.682 1.1-1.2 1.272-.847.283-1.803.276-2.516.211a9.877 9.877 0 0 1-.443-.05 9.364 9.364 0 0 1-.062 4.51c-.138.508-.55.848-1.012.964l-.261.065zM11.5 1H8c-.51 0-.863.068-1.14.163-.281.097-.506.229-.776.393l-.04.025c-.555.338-1.198.73-2.49.868-.333.035-.554.29-.554.55V7c0 .255.226.543.62.65 1.095.3 1.977.997 2.614 1.709.635.71 1.064 1.475 1.238 1.977.243.7.407 1.768.482 2.85.025.362.36.595.667.518l.262-.065c.16-.04.258-.144.288-.255a8.34 8.34 0 0 0-.145-4.726.5.5 0 0 1 .595-.643h.003l.014.004.058.013a8.912 8.912 0 0 0 1.036.157c.663.06 1.457.054 2.11-.163.175-.059.45-.301.57-.651.107-.308.087-.67-.266-1.021L12.793 7l.353-.354c.043-.042.105-.14.154-.315.048-.167.075-.37.075-.581 0-.211-.027-.414-.075-.581-.05-.174-.111-.273-.154-.315l-.353-.354.353-.354c.047-.047.109-.176.005-.488a2.224 2.224 0 0 0-.505-.804l-.353-.354.353-.354c.006-.005.041-.05.041-.17a.866.866 0 0 0-.121-.415C12.4 1.272 12.063 1 11.5 1z"/>
-</svg>
 <svg data-action="download" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
   <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
   <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
@@ -238,19 +249,27 @@
             </div>
            
         </div>
-    <div class="row text-center">
+    <div class="row text-center pb-1">
         <div class="col-8">
             <input type="text" id="input_text" class="w-100" onkeydown="if(event.keyCode == 13) $('button[data-action=sendMsg]')[0].click();">
         </div>
-        <div class="col-4">
-        	<button data-action="sendDanmu" class="btn-primary w-100" style="display: none"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-quote-fill" viewBox="0 0 16 16">
+        	<button data-action="sendMsg" class="btn-primary col-4 w-100">発信</button>
+        </div>
+        <div class="row" id="danmu_bar">
+        	<select class="form-select col-8" id='danmu_selecter'>
+			  <option selected disabled>弾幕を選ぶ</option>
+			  <option>wwww</option>
+			  <option>いいね！</option>
+			  <option>そんな…</option>
+			  <option>888888</option>
+			</select>
+			<button data-action="sendDanmu" class="btn-primary col-4 w-100 " ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-quote-fill" viewBox="0 0 16 16">
 <path d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM7.194 6.766a1.688 1.688 0 0 0-.227-.272 1.467 1.467 0 0 0-.469-.324l-.008-.004A1.785 1.785 0 0 0 5.734 6C4.776 6 4 6.746 4 7.667c0 .92.776 1.666 1.734 1.666.343 0 .662-.095.931-.26-.137.389-.39.804-.81 1.22a.405.405 0 0 0 .011.59c.173.16.447.155.614-.01 1.334-1.329 1.37-2.758.941-3.706a2.461 2.461 0 0 0-.227-.4zM11 9.073c-.136.389-.39.804-.81 1.22a.405.405 0 0 0 .012.59c.172.16.446.155.613-.01 1.334-1.329 1.37-2.758.942-3.706a2.466 2.466 0 0 0-.228-.4 1.686 1.686 0 0 0-.227-.273 1.466 1.466 0 0 0-.469-.324l-.008-.004A1.785 1.785 0 0 0 10.07 6c-.957 0-1.734.746-1.734 1.667 0 .92.777 1.666 1.734 1.666.343 0 .662-.095.931-.26z"/>
 </svg></button>
-        <button data-action="sendMsg" class="btn-primary w-100"><svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-cursor-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z" />
-            </svg></button>
+        	
         </div>
-                
+
+         <div class="row">
         <div class="col-2">
             <svg data-action="selectMusic" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-music-note-beamed" viewBox="0 0 16 16">
                 <path d="M6 13c0 1.105-1.12 2-2.5 2S1 14.105 1 13c0-1.104 1.12-2 2.5-2s2.5.896 2.5 2zm9-2c0 1.105-1.12 2-2.5 2s-2.5-.895-2.5-2 1.12-2 2.5-2 2.5.895 2.5 2z" />
@@ -264,7 +283,7 @@
             </svg>
         </div>
         <div class="col-2">
-            <svg data-action="selectVideo" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16">
+            <svg onclick="$('#modal_link').modal('show')" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16">
                 <path d="M4.715 6.542L3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.001 1.001 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z" />
                 <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 0 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 0 0-4.243-4.243L6.586 4.672z" />
             </svg>
@@ -286,6 +305,7 @@
                 <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
             </svg>
         </div>
+    </div>
     </div>
     </div>
     <!-- 弹窗插件 -->
@@ -352,6 +372,7 @@
         <div class="hsycms-model-text">読み込み中</div>
     </div>
     <audio></audio>
+    <audio id='audio_tip' autoplay></audio>
 </body>
 <script src="js/jquery.min.js"></script>
 <script src="js/until.js"></script>

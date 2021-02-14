@@ -1,6 +1,6 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-
+set_time_limit(-1);
 // search.php?server=&type=search&name=
 // $_GET['type'] = 'lyric';
 // $_GET['id'] = '857619';
