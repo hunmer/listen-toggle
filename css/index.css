@@ -1,0 +1,59 @@
+.round {
+	border-radius: 50%;
+}
+
+svg,img {
+	cursor: pointer;
+}
+
+.danmu-switch {
+	display: none;
+}
+
+.lang-is-jp .xgplayer-pip .name span {
+    width: 100px !important;
+    height: 20px;
+}
+
+.arrow {  
+    width: 0;  
+    height: 0;  
+    font-size: 0;  
+    border-width: 10px;  
+    border-style: solid;  
+    position: absolute;  
+    bottom: 0px;  
+    border-color: transparent transparent transparent #cce5ff;  
+    right: -20px;  
+}  
+
+.msg {
+	width: 100%;
+}
+
+.msg_content {
+	max-width: 80%;
+	margin-left: 10px;
+	width: fit-content;
+    float: right;
+    margin-right: 70px;
+}
+
+.msg:nth-last-child(1) {
+	margin-bottom: 500px;
+}
+
+.user_cover {
+	border-radius: 50%;
+	position: absolute;
+	right: 10px;
+
+}
+
+#mse {
+	/*width: 100%;
+	max-height: 300px;*/
+	margin-bottom: 10px;
+	display: none;
+	flex:auto;
+}
