@@ -1,7 +1,10 @@
 
 // var socket_url = 'ws://192.168.1.3:8000';
 var socket_url = 'wss://listen-toggle-websocket.glitch.me';
+var api_url = 'https://listen-toggle.glitch.me';
+// var api_url = '.';
 var connection;
+var g_listPlayer = {};
 var g_playing = {
 	data: {
 		id: null,
@@ -19,6 +22,30 @@ $(function() {
 
 function queryMsg(msg){
 	connection.send(msg);
+}
+
+function recon(){
+	hsycms.confirm('confirm','サーバー接続に失敗しました！ 再接続しましたか？',
+     function(res){            
+     	connection.close();
+     	connection = new WebSocket(socket_url)
+		hsycms.loading('loading','読み込み中');
+     },
+    function(res){
+     },
+  );
+}
+
+function checkOnline(){
+	  var online;
+	for(let name in g_datas.user){
+  			online = g_listPlayer[name] != undefined;
+  			if(online && $('[data-user="'+name+'"]').find('.badge').html() !== 'offline'){
+  				// 已经在线上
+  			}else{
+  				updateStatus(name, online ? 'online' : 'offline', online ? 'bg-primary' : 'bg-secondary');
+  			}
+  		}
 }
 
 var _audio;
@@ -44,27 +71,20 @@ function init(){
 		checkPlayerTimer = setInterval(() => {
 			queryMsg('list');
 		}, 5000);
+		queryMsg('list');
+		checkOnline();
 	}
 
 	connection.onclose = () => {
-		queryMsg('status||'+g_config.user+'||offline||bg-secondary');
+		recon();
 	}
 
 	connection.onerror = (error) => {
-	  console.log(`WebSocket error: ${error}`);
-	   hsycms.confirm('confirm','サーバー接続に失敗しました！ 再接続しましたか？',
-	         function(res){            
-	         	connection.close();
-	         	connection = new WebSocket(socket_url)
-				hsycms.loading('loading','読み込み中');
-	         },
-	        function(res){
-	         },
-	      );
+	   recon();
 	}
 
 	connection.onmessage = (e) => {
-	  console.log(e.data);
+	  // console.log(e.data);
 	  var params = e.data.split('||');
 	  switch (params[0]) {
 	  	case 'msg':
@@ -84,16 +104,8 @@ function init(){
 	  		break;
 
 	  	case 'list':
-	  		var online;
 	  		g_listPlayer = JSON.parse(params[1]);
-	  		for(let name in g_datas.user){
-	  			online = g_listPlayer[name] != undefined;
-	  			if(online && $('[data-user="'+name+'"]').find('.badge').html() !== 'offline'){
-	  				// 已经在线上
-	  			}else{
-	  				updateStatus(name, online ? 'online' : 'offline', online ? 'bg-primary' : 'bg-secondary');
-	  			}
-	  		}
+	  		checkOnline();
 	  		break;
 
 	  	case 'status':
@@ -148,12 +160,12 @@ function init(){
 		console.log('加载失败!');
 	}
 	_audio.ontimeupdate = (e) => {
-		var pro = parseInt(_audio.currentTime / _audio.duration * 100);
-		$('.progress-bar').css('width', pro + '%');
-		if(pro % 1 == 0 && last_pro != pro){
-			last_pro = pro;
-			queryMsg('status||'+g_config.user+'||'+pro+'%||bg-info');
-		}
+		var pro = _audio.currentTime / _audio.duration * 100;
+		$('.progress-bar').css('width', parseInt(pro) + '%');
+		//if(pro % 1 == 0 && last_pro != pro){
+		//	last_pro = pro;
+			queryMsg('status||'+g_config.user+'||'+pro+'||bg-info');
+		//}
 
 		var d, p;
 		for(var i=g_lrcs.length;i>0;i--){
@@ -246,22 +258,19 @@ function init(){
           }
         },
         height: 300,
-        width: Window.innerWidth,
+        width: '100%',
         whitelist: ['']
       });
 
 	_video.on('error', () => {
 		queryMsg('status||'+g_config.user+'||faild||bg-danger');
 	});
-	_video.on('waiting', () => {
-		queryMsg('status||'+g_config.user+'||loading||bg-light');
-	});
 	_video.on('timeupdate', () => {
-		var pro = parseInt(_video.currentTime / _video.duration * 100);
-		if(pro % 1 == 0 && last_pro != pro){
-			last_pro = pro;
-			queryMsg('status||'+g_config.user+'||'+pro+'%||bg-info');
-		}
+		var pro = _video.currentTime / _video.duration * 100;
+		//if(pro % 1 == 0 && last_pro != pro){
+		//	last_pro = pro;
+			queryMsg('status||'+g_config.user+'||'+pro+'||bg-info');
+		//}
 	});
 	_video.on('load', () => {
 		if(g_playing.target){
@@ -278,7 +287,6 @@ function init(){
 
 	$('.player').hide();
 	$('#danmu_bar').hide();
-
 	// $('#modal_music').modal();
 	// search('music', '深海少女');
 	 // $('#modal_link').modal();
@@ -310,8 +318,8 @@ function onAction(dom, action){
 				break;
 
 			case 'sendMedia':
+
 				var parent = dom.parents('[data-json]');
-				console.log(parent);
 				var data = JSON.parse(parent.attr('data-json'));
 				if(data){
 					data.type = parent.attr('data-type');
@@ -409,15 +417,20 @@ function onAction(dom, action){
 
 			case 'selectUser':
 				var user = dom.attr('data-user');
-				var pro = parseInt(dom.find('.badge').html().replace('%', '')) / 100;
+				var pro = dom.find('.badge').attr('data-time') / 100;
+				console.log(pro);
 				if(pro > 0){
-					pro += 0.005; //偏差
+					pro += 0.0005; //偏差
 					var json = JSON.parse(g_listPlayer[user]);
-					if(json['id'] != g_playing.data.id && json['source'] != g_playing.data.source){ // 不是同一首歌
+					if(JSON.stringify(json) != JSON.stringify(g_playing.data)){ //不是同一首歌
 						parseMusic(json);
 						g_playing.target = pro;
 					}else{
-						_audio.currentTime = pro * _audio.duration;
+						if(g_playing.data.type == 'video'){
+							_video.currentTime = pro * _video.duration;
+						}else{
+							_audio.currentTime = pro * _audio.duration;
+						}
 					}
 				}
 				break;
@@ -425,7 +438,7 @@ function onAction(dom, action){
 		}
 
 			$('.progress').click(function(event) {
-				if(_audio.duration) _audio.currentTime = event.originalEvent.offsetX / $dom.width() * _audio.duration;
+				if(_audio.duration) _audio.currentTime = event.originalEvent.offsetX / $(this).width() * _audio.duration;
 			});
 		
 
@@ -452,8 +465,8 @@ function sendDanmu(msg){
 
 function parseMusic(json){
 	if(JSON.stringify(json) != JSON.stringify(g_playing.data)){ // 换歌全服提示
-		$('[data-action=up]').removeClass('active');
-		$('[data-action=down]').removeClass('active');
+		$('[data-action=up]').removeClass('text-info');
+		$('[data-action=down]').removeClass('text-info');
 		queryMsg('broadcast||listen||'+g_config.user+'||'+JSON.stringify(json));
 	}
 
@@ -467,8 +480,8 @@ function parseMusic(json){
 		$('#music_name').html(json['name'] + '/' + json['artist']);
 		$('#music_lyric').html('loading..');
 		$('#music_cover').attr('src', json['pic']);
-		setPlaying(json['url'] ? json['url'] : './api/search.php?server='+json['source']+'&type=url&id='+json['id']);
-		searchLyric('./api/search.php?server='+json['source']+'&type=lyric&id='+json['id']);
+		setPlaying(json['url'] ? json['url'] : api_url+'/api/search.php?server='+json['source']+'&type=url&id='+json['id']);
+		searchLyric(api_url+'/api/search.php?server='+json['source']+'&type=lyric&id='+json['id']);
 	}else
 	if(json['type'] == 'video'){
 		$('#mse').show();
@@ -477,13 +490,18 @@ function parseMusic(json){
 		$('.player').hide();
 
 		_video.poster = json['pic'];
-		_video.src = json['url'] ? json['url'] : './api/video.php?server='+json['source']+'&type=url&id='+json['id'];
+		_video.src = json['url'] ? json['url'] : api_url+'/api/video.php?server='+json['source']+'&type=url&id='+json['id'];
 		_video.autoplay = true;
 	}
 }
 
-function updateStatus(user, status, color = 'bg-info'){
-	$('[data-user="'+user+'"]').find('span').html(status)[0].className = 'badge ' + color;
+function updateStatus(user, status, color = 'bg-dark'){
+	var span = $('[data-user="'+user+'"]').find('span');
+	if(color == 'bg-info'){ // 时间特定
+		span.attr('data-time', status); // 标记时间
+		status = parseInt(status) + '%'; // 取整数
+	}
+	span.html(status)[0].className = 'badge ' + color;
 }
 
 function uploadImage(file){
@@ -571,7 +589,8 @@ function dom_broadcast(html){
 
 function insertHtml(html){
 	$('.container').append(html);
-	$('html,body').animate({ scrollTop: $(window).height()}, 0);
+	var dom = $('.msg');
+	$('html,body').animate({ scrollTop: $(dom[dom.length-1])[0].offsetTop+'px'}, 0);
 	soundTip('./res/pop.mp3');
 }
 
@@ -672,16 +691,17 @@ function search(type, name){
 	var html;
 	// ,'kugou' 'baidu'
 	if(type == 'music'){
+	$('#list_'+type+' ul').html('');
 	$('#modal_music .checkbox_list').find('input[type=checkbox]:checked').each((i, d) => {
 		site = d.value;
 		if(site != 'all'){
-			$.getJSON('api/search.php?server='+site+'&type=search&name='+name, function(json, textStatus) {
+			$.getJSON(api_url+'/api/search.php?server='+site+'&type=search&name='+name, function(json, textStatus) {
 			if(textStatus == 'success'){
 				html = '';
 				for(var detail of json){
 					if(typeof(detail['artist']) == 'object'){
 						detail['artist'] = detail['artist'].join('&');
-						detail['pic'] = './api/search.php?server='+detail['source']+'&type=cover&id='+detail['pic_id'];
+						detail['pic'] = api_url+'/api/search.php?server='+detail['source']+'&type=cover&id='+detail['pic_id'];
 					}else{ // youtube
 						detail['album'] = ''; // 没有专辑信息
 					}
@@ -715,7 +735,7 @@ function search(type, name){
 		})
 	}else
 	if(type == 'video'){
-		$.getJSON('api/video.php?server=youtube&type=search&name='+name, function(json, textStatus) {
+		$.getJSON(api_url+'/api/video.php?server=youtube&type=search&name='+name, function(json, textStatus) {
 			if(textStatus == 'success'){
 				html = '';
 				for(var detail of json){
@@ -736,7 +756,7 @@ function search(type, name){
 					  		</div>
 					  </li>`;
 				}
-				$('#list_'+type+' ul').append(html).
+				$('#list_'+type+' ul').html(html).
 				find('.lazyload').lazyload({effect: "fadeIn"});
 			}
 		});
