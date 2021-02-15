@@ -493,7 +493,7 @@ function parseMusic(json) {
     g_playing.data = json;
     queryMsg('status||' + g_config.user + '||loading||bg-light');
     if (json['type'] == 'music') {
-        _video.src = '';
+        if(_video) _video.src = '';
         $('#danmu_bar').hide();
         $('#mse').hide();
         $('.player').show();
