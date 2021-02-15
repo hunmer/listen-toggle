@@ -1,7 +1,7 @@
-var socket_url = 'ws://192.168.1.3:8000';
-var api_url = '.';
-// var socket_url = 'wss://listen-toggle-websocket.glitch.me';
-// var api_url = 'https://listen-toggle.glitch.me';
+// var socket_url = 'ws://192.168.1.3:8000';
+// var api_url = '.';
+var socket_url = 'wss://listen-toggle-websocket.glitch.me';
+var api_url = 'https://listen-toggle.glitch.me';
 var connection;
 var g_listPlayer = {};
 var g_playing = {
