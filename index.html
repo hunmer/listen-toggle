@@ -116,32 +116,33 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <div class="row">
-                        	<select class="form-select col-2">
-							  <option value="video" selected>Video</option>
+                        	<select class="form-select col-3" id="share_select">
+							  <option value="video" selected>URL</option>
+							  <option value="video">Video</option>
 							  <option value="audio">Audio</option>
 							  <option value="image">Image</option>
 							</select>
-                            <input class="col-8" style="width: 80%" type="text" id="input_link" placeholder="..." value="https://1251316161.vod2.myqcloud.com/007a649dvodcq1251316161/23660bf95285890806444861886/0akkd57pzpcA.mp4">
+                            <input class="col-7" style="width: 80%" type="text" id="input_link" placeholder="..." value="https://www.youtube.com/watch?v=d86hKJNehI8">
                             <button id="btn_share_link" onclick="shareLink()" class="btn btn-success col-2">発信</button>
 
                             <div class="mt-3 col-12">
 							  <label for="input_name" class="form-label">Title</label>
-							  <input style="width: 100%" type="text" id="input_name" placeholder="Title" value="ダンス イン ザ ヴァンパイアバンド - 01">
+							  <input style="width: 100%" type="text" id="input_name" placeholder="Title" value="">
 							</div>
 
 							<div class="mt-3 col-12">
 							  <label for="input_artist" class="form-label">Artits</label>
-							  <input style="width: 100%" type="text" id="input_artist" placeholder="Artits" value="SHAFT">
+							  <input style="width: 100%" type="text" id="input_artist" placeholder="Artits" value="">
 							</div>
 
 							<div class="mt-3 col-12">
 							  <label for="input_album" class="form-label">Album</label>
-							  <input style="width: 100%" type="text" id="input_album" placeholder="Alubm" value="Album">
+							  <input style="width: 100%" type="text" id="input_album" placeholder="Alubm" value="">
 							</div>
 
 							<div class="mt-3 col-12">
 							  <label for="input_cover" class="form-label">Cover</label>
-							  <input style="width: 100%" type="text" id="input_cover" placeholder="Cover" value="https://sc02.alicdn.com/kf/H62eaa481eedd4e58ac6166d858686124r.jpg">
+							  <input style="width: 100%" type="text" id="input_cover" placeholder="Cover" value="./img/cover.webp">
 							</div>
 						
                         </div>

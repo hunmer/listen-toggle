@@ -28,17 +28,19 @@ if($server == 'youtube'){
 
 			$ret = [];
 			foreach($content['items'] as $detail){
+				$id = $detail['id']['videoId'];
 				$ret[] = [
-					'id' => $detail['id']['videoId'],
+					'id' => $id,
 					'name' => $detail['snippet']['title'],
 					'artist' => $detail['snippet']['channelTitle'],
 					'pic' => $detail['snippet']['thumbnails']['medium']['url'],
+					'url' => 'https://alltubedownload.net/download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D'.$id,
 					'source' => 'youtube'
 				];
 			}
 			echo json_encode($ret);
 			break;
-
+			
 		case 'url':
 			$ch = curl_init();
 			$options =  array(
@@ -55,6 +57,7 @@ if($server == 'youtube'){
 			);
 			curl_setopt_array($ch, $options);
 			$json = json_decode(curl_exec($ch), true);
+
 			// foreach($json['formats'] as $v){
 			// 	if(!is_null($v['filesize'])){
 					$s_url = 'https://alltubedownload.net/download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D'.getParam('id').'&format='.$json['format_id'];

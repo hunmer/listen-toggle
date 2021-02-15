@@ -21,6 +21,18 @@ var g_datas = {
     }
 }
 
+  function cutString(str, s, e) {
+        var i_start = str.indexOf(s);
+        if (i_start != -1) {
+            i_start += s.length;
+            var i_end = str.indexOf(e, i_start);
+            if (i_end != -1) {
+                return str.substr(i_start, i_end - i_start);
+            }
+        }
+        return '';
+    }
+
 function getGETArray() {
     var a_result = [], a_exp;
     var a_params = window.location.search.slice(1).split('&');

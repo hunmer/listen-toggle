@@ -39,11 +39,13 @@ if($server == 'youtube'){
 
 			$ret = [];
 			foreach($content['items'] as $detail){
+				$id = $detail['id']['videoId'];
 				$ret[] = [
-					'id' => $detail['id']['videoId'],
+					'id' => $id,
 					'name' => $detail['snippet']['title'],
 					'artist' => $detail['snippet']['channelTitle'],
 					'pic' => $detail['snippet']['thumbnails']['medium']['url'],
+					'url' => 'https://alltubedownload.net/download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D'.$id,
 					'source' => 'youtube'
 				];
 			}
