@@ -505,11 +505,11 @@ function parseMusic(json) {
     } else
     if (json['type'] == 'video') {
         $('#mse').show();
-        $('#danmu_bar').show();
         _audio.src = '';
         $('.player').hide();
 
         loadVideo(json['url'] ? json['url'] : api_url + '/api/video.php?server=' + json['source'] + '&type=url&id=' + json['id'], json['pic']);
+        $('#danmu_bar').show();
     }
 }
 
