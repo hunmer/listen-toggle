@@ -21,7 +21,7 @@ $(function() {
 
 function queryMsg(msg, debug = false) {
     connection.send(msg);
-    if(debug) console.log(debug);
+    if (debug) console.log(debug);
 }
 
 function recon() {
@@ -73,6 +73,7 @@ function init() {
         }, 5000);
         queryMsg('list');
         checkOnline();
+        // queryMsg('sendMedia||maki||{"name":"僕たちの七日間戦争","ablum":"","artist":"","url":"https://youku.cdn7-okzy.com/20200325/18173_e01b3f41/1000k/hls/index.m3u8","pic":"https://img2.nysk.fj.cn/pic/tt27imgs/2020-3/1585121440.jpg","type":"video"}');
     }
 
     connection.onclose = () => {
@@ -92,7 +93,21 @@ function init() {
                 break;
 
             case 'danmu':
-                _video.danmu.sendComment(JSON.parse(params[2]));
+                var danmu = _video.addElement(JSON.parse(params[2]));
+                var danmuS = _video.getElement(danmu);
+                var obj = {
+                    element: danmu,
+                    parameter: 'x',
+                    static: true, //是否禁止其它属性，true=是，即当x(y)(alpha)变化时，y(x)(x,y)在播放器尺寸变化时不允许变化
+                    effect: 'None.easeOut',
+                    start: null,
+                    end: -danmuS['width'],
+                    speed: 10,
+                    overStop: true,
+                    pauseStop: true,
+                    callBack: 'deleteChild'
+                };
+                var danmuAnimate = _video.animate(obj);
                 break;
 
             case 'leave':
@@ -135,8 +150,8 @@ function init() {
                     case 'listen':
                         var detail = JSON.parse(params[3]);
                         html = `<span class="msg badge text-light mb-2" data-type="` + detail['type'] + `" data-json='` + params[3] + `'><span class="bg-dark p-2">` + params[2] + 'は<span class="text-white">' + detail['name'] + `</span>を聞いています<svg xmlns="http://www.w3.org/2000/svg" data-action="play" width="20" height="20" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
-								  <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
-								</svg></span></span>`;
+                                  <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                                </svg></span></span>`;
                         break;
                     default:
                         return;
@@ -163,7 +178,7 @@ function init() {
         var pro = _audio.currentTime / _audio.duration * 100;
         $('.progress-bar').css('width', parseInt(pro) + '%');
         //if(pro % 1 == 0 && last_pro != pro){
-        //	last_pro = pro;
+        //  last_pro = pro;
         queryMsg('status||' + g_config.user + '||' + pro + '||bg-info');
         //}
 
@@ -175,7 +190,7 @@ function init() {
                 if (last_lrctime != d.time) {
                     last_lrctime = d.time;
                     $('#music_lyric').html(`
-						<span class="text-info">` + d.lrc + `</span>` +
+                        <span class="text-info">` + d.lrc + `</span>` +
                         (i != g_lrcs.length - 1 ? `</br><span class="">` + g_lrcs[i].lrc + `</span>` : '')
                     );
                 }
@@ -196,13 +211,12 @@ function init() {
         queryMsg('status||' + g_config.user + '||終了||bg-light');
     }
 
-    new ClipboardJS('#clipboard');
     window.history.pushState(null, null, "#");
     window.addEventListener("popstate", function(event) {
         window.history.pushState(null, null, "#");
         event.preventDefault(true);
         event.stopPropagation();
-        //$('#modal1').modal('close');
+        $('.modal').modal('hide');
     });
 
     $(document).on('click', '[data-action]', function(event) {
@@ -227,97 +241,61 @@ function init() {
     // {name: "", ablum: "", artist: "", url: "https://www.youtube.com/watch?v=d86hKJNehI8", pic: "./img/cover.webp", …}
 }
 
+
+function loadedHandler(name) {
+    //调用到该函数后说明播放器已加载成功，可以进行部分控制了。此时视频还没有加载完成，所以不能控制视频的播放，暂停，获取元数据等事件
+    _video.addListener('error', () => {
+        queryMsg('status||' + g_config.user + '||faild||bg-danger');
+    });
+    _video.addListener('time', () => {
+        console.log();
+        var pro = _video.V.currentTime / _video.V.duration * 100;
+        if (!isNaN(pro)) {
+            queryMsg('status||' + g_config.user + '||' + pro + '||bg-info');
+
+        }
+    });
+    _video.addListener('load', () => {
+        /*if (g_playing.target) {
+            console.log('调整到 ' + g_playing.target);
+            _video.V.currentTime = g_playing.target * _video.V.duration;
+            g_playing.target = undefined;
+        }*/
+    });
+    _video.addListener('ended', () => {
+        if (_video.V.duration > 0) {
+            queryMsg('status||' + g_config.user + '||終了||bg-light');
+        }
+    });
+}
+
 function loadVideo(url, poster = '') {
+    if(!poster) poster = '.img/loading.gif';
+    var config = {
+        container: '#mse', //“#”代表容器的ID，“.”或“”代表容器的class
+        variable: '_video', //播放函数名称，该属性必需设置，值等于下面的new ckplayer()的对象
+        loaded: 'loadedHandler', //播放器加载完成后调用该函数
+        volume: 1, //音量，范围：0-1
+        html5m3u8: url.substr(-5).toLocaleLowerCase() == '.m3u8',
+        poster: poster,
+        video: url, //视频地址
+    };
     if (!_video) {
-
-        _video = new Player({
-            id: 'mse',
-            autoplay: true,
-            volume: 1,
-            videoInit: true,
-            // fitVideoSize: 'auto',
-            // miniplayer: true,
-            // pip: true,
-            lang: 'jp',
-            url: url,
-            // url:'//sf1-hscdn-tos.pstatp.com/obj/media-fe/xgplayer_doc_video/mp4/xgplayer-demo-360p.mp4',
-            poster: poster,
-            // playsinline: true,
-            // thumbnail: {
-            //     pic_num: 44,
-            //     width: 160,
-            //     height: 90,
-            //     col: 10,
-            //     row: 10,
-            //     urls: ['//s3.pstatp.com/cdn/expire-1-M/byted-player-videos/1.0.0/xgplayer-demo-thumbnail.jpg'],
-            // },
-            danmu: {
-                comments: [
-                    /*{
-                      duration: 15000,
-                      id: '1',
-                      start: 3000,
-                      txt: '长弹幕长弹幕长弹幕长弹幕长弹幕',
-                      style: {  //弹幕自定义样式
-                        color: '#ff9500',
-                        fontSize: '20px',
-                        border: 'solid 1px #ff9500',
-                        borderRadius: '50px',
-                        padding: '5px 11px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                      }
-                    }*/
-                ],
-                area: {
-                    start: 0,
-                    end: 1
-                }
-            },
-            height: 300,
-            width: '100%',
-            whitelist: ['']
-        });
-
-        _video.on('error', () => {
-            queryMsg('status||' + g_config.user + '||faild||bg-danger');
-        });
-        _video.on('timeupdate', () => {
-            var pro = _video.currentTime / _video.duration * 100;
-            if(!isNaN(pro)){
-            	queryMsg('status||' + g_config.user + '||' + pro + '||bg-info');
-
-            }
-        });
-        _video.on('load', () => {
-            if (g_playing.target) {
-                console.log('调整到 ' + g_playing.target);
-                _video.currentTime = g_playing.target * _video.duration;
-                g_playing.target = undefined;
-            }
-        });
-        _video.on('ended', () => {
-            if (_video.duration > 0) {
-                queryMsg('status||' + g_config.user + '||終了||bg-light');
-            }
-        });
-        $('#danmu_bar').hide();
-  		  $('.xgplayer-placeholder').append($(`<input class="ml-2 mt-2" style="width: 150px" type="text" id="input_danmu" placeholder="弹幕" onkeydown="if(event.keyCode == 13 && !event.ctrlKey){sendDanmu(this.value);this.value = '';}">`));
-
+        _video = new ckplayer(config);
+        //$('.xgplayer-placeholder').append($(`<input class="ml-2 mt-2" style="width: 150px" type="text" id="input_danmu" placeholder="弹幕" onkeydown="if(event.keyCode == 13 && !event.ctrlKey){sendDanmu(this.value);this.value = '';}">`));
     } else {
-    	_video.src = url;
-    	_video.poster = poster;
+        _video.newVideo(config);
     }
-
 }
 
 function shareLink() {
-	var url = $('#input_link').val();
-	var id = cutString(url + '&', 'v=', '&');
-	var cover = $('#input_cover').val();
-	var name = $('#input_name').val();
-	if(cover == ''){
-		cover = id ? 'https://i.ytimg.com/an_webp/'+id+'/mqdefault_6s.webp' : './img/cover.webp';
-	}
+    var url = $('#input_link').val();
+    var id = cutString(url + '&', 'v=', '&');
+    var cover = $('#input_cover').val();
+    var name = $('#input_name').val();
+    if (cover == '') {
+        cover = id ? 'https://i.ytimg.com/an_webp/' + id + '/mqdefault_6s.webp' : './img/cover.webp';
+    }
     var data = {
         name: name ? name : url,
         ablum: $('#input_album').val(),
@@ -326,7 +304,7 @@ function shareLink() {
         pic: cover,
         type: $('#modal_link option:selected').val()
     };
-    console.log(data);
+    console.log('sendMedia||' + g_config.user + "||" + JSON.stringify(data));
     queryMsg('sendMedia||' + g_config.user + "||" + JSON.stringify(data));
     $('#modal_link').modal('hide');
 }
@@ -447,7 +425,7 @@ function onAction(dom, action) {
                     g_playing.target = pro;
                 } else {
                     if (g_playing.data.type == 'video') {
-                        _video.currentTime = pro * _video.duration;
+                        _video.V.currentTime = pro * _video.V.duration;
                     } else {
                         _audio.currentTime = pro * _audio.duration;
                     }
@@ -461,26 +439,52 @@ function onAction(dom, action) {
         if (_audio.duration) _audio.currentTime = event.originalEvent.offsetX / $(this).width() * _audio.duration;
     });
 
-
 }
 
-
 function sendDanmu(msg) {
-    var prop = {
-        duration: 15000,
-        id: 'danmu_' + new Date().getTime(),
-        start: _video.currentTime * 1000,
-        txt: g_config.user + ' : ' + msg,
-        style: {
-            color: '#ff9500',
-            fontSize: '20px',
-            border: 'solid 1px #ff9500',
-            borderRadius: '50px',
-            padding: '5px 11px',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)'
-        }
-    };
-    queryMsg('danmu||' + g_config.user + '||' + JSON.stringify(prop));
+    var danmuObj = {
+        list: [{
+            type: 'image', //定义元素类型：只有二种类型，image=使用图片，text=文本
+            file: $('.navbar-brand img').attr('src'), //图片地址
+            radius: 30, //图片圆角弧度
+            width: 30, //定义图片宽，必需要定义
+            height: 30, //定义图片高，必需要定义
+            alpha: 0.9, //图片透明度(0-1)
+            marginLeft: 10, //图片离左边的距离
+            marginRight: 10, //图片离右边的距离
+            marginTop: 10, //图片离上边的距离
+            marginBottom: 10, //图片离下边的距离
+            clickEvent: ""
+        }, {
+            type: 'text', //说明是文本
+            text: msg, //文本内容
+            color: '0xFFDD00', //文本颜色
+            size: 14, //文本字体大小，单位：px
+            font: '"Microsoft YaHei", YaHei, "微软雅黑", SimHei,"\5FAE\8F6F\96C5\9ED1", "黑体",Arial', //文本字体
+            leading: 30, //文字行距
+            alpha: 1, //文本透明度(0-1)
+            paddingLeft: 10, //文本内左边距离
+            paddingRight: 10, //文本内右边距离
+            paddingTop: 0, //文本内上边的距离
+            paddingBottom: 0, //文本内下边的距离
+            marginLeft: 0, //文本离左边的距离
+            marginRight: 10, //文本离右边的距离
+            marginTop: 10, //文本离上边的距离
+            marginBottom: 0, //文本离下边的距离
+            backgroundColor: '0xFF0000', //文本的背景颜色
+            backAlpha: 0.5, //文本的背景透明度(0-1)
+            backRadius: 30, //文本的背景圆角弧度
+            clickEvent: "actionScript->videoPlay"
+        }],
+        x: '100%', //x轴坐标
+        y: 20, //y轴坐标
+        //position:[2,1,0],//位置[x轴对齐方式（0=左，1=中，2=右），y轴对齐方式（0=上，1=中，2=下），x轴偏移量（不填写或null则自动判断，第一个值为0=紧贴左边，1=中间对齐，2=贴合右边），y轴偏移量（不填写或null则自动判断，0=紧贴上方，1=中间对齐，2=紧贴下方）]
+        alpha: 1,
+        //backgroundColor:'#FFFFFF',
+        backAlpha: 0.8,
+        backRadius: 30 //背景圆角弧度
+    }
+    queryMsg('danmu||' + g_config.user + '||' + JSON.stringify(danmuObj));
 }
 
 function parseMusic(json) {
@@ -493,7 +497,7 @@ function parseMusic(json) {
     g_playing.data = json;
     queryMsg('status||' + g_config.user + '||loading||bg-light');
     if (json['type'] == 'music') {
-        if(_video) _video.src = '';
+        if (_video) _video.V.src = '';
         $('#danmu_bar').hide();
         $('#mse').hide();
         $('.player').show();
@@ -532,11 +536,11 @@ function uploadImage(file) {
 
 function dom_addImage(userName, data) {
     insertHtml(`<div class="msg float-right"'>
-  	<img src="img/` + userName + `.jpg" width="45px" height="45px" class="user_cover">
-  	<div class="alert alert-primary msg_content" role="alert" >
-  		<div class="arrow"></div>
-  		<img src=` + data + ` class="w-100">
-	</div>
+    <img src="img/` + userName + `.jpg" width="45px" height="45px" class="user_cover">
+    <div class="alert alert-primary msg_content" role="alert" >
+        <div class="arrow"></div>
+        <img src=` + data + ` class="w-100">
+    </div>
   </div>`);
 }
 
@@ -551,53 +555,53 @@ function dom_addMedia(userName, data) {
     switch (detail['type']) {
         case 'music':
             html = `
-			<div class="card" style="width: 18rem;">
-			  <img src='` + detail['pic'] + `' height="300px" class="card-img-top" alt="...">
-			  <div class="card-body">
-			    <h5 class="card-title"> ` + detail['name'] + `</h5>
-			    <p class="card-text">` + detail['album'] + `</p>
-			    <p class="card-text">` + detail['artist'] + `</p>
-			    <a href="javascript: void(0)" class="btn btn-primary float-right"><svg xmlns="http://www.w3.org/2000/svg" data-action="play" width="30" height="30" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
-				  <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
-				</svg></a>
-			  </div>
-			</div>
-			`;
+            <div class="card" style="width: 18rem;">
+              <img src='` + detail['pic'] + `' height="300px" class="card-img-top" alt="...">
+              <div class="card-body">
+                <h5 class="card-title"> ` + detail['name'] + `</h5>
+                <p class="card-text">` + detail['album'] + `</p>
+                <p class="card-text">` + detail['artist'] + `</p>
+                <a href="javascript: void(0)" class="btn btn-primary float-right"><svg xmlns="http://www.w3.org/2000/svg" data-action="play" width="30" height="30" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
+                  <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                </svg></a>
+              </div>
+            </div>
+            `;
             break;
 
         case 'video':
             html = `
-			<div class="card" style="width: 18rem;">
-			  <img src='` + detail['pic'] + `' height="300px" class="card-img-top" alt="...">
-			  <div class="card-body">
-			    <h5 class="card-title"> ` + detail['name'] + `</h5>
-			    <p class="card-text">` + detail['artist'] + `</p>
-			    <a href="javascript: void(0)" class="btn btn-primary float-right"><svg xmlns="http://www.w3.org/2000/svg" data-action="play" width="30" height="30" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
-				  <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
-				</svg></a>
-			  </div>
-			</div>
-			`;
+            <div class="card" style="width: 18rem;">
+              <img src='` + detail['pic'] + `' height="300px" class="card-img-top" alt="...">
+              <div class="card-body">
+                <h5 class="card-title"> ` + detail['name'] + `</h5>
+                <p class="card-text">` + detail['artist'] + `</p>
+                <a href="javascript: void(0)" class="btn btn-primary float-right"><svg xmlns="http://www.w3.org/2000/svg" data-action="play" width="30" height="30" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
+                  <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                </svg></a>
+              </div>
+            </div>
+            `;
             break;
     }
     if (html) {
         insertHtml(`<div class="msg float-right" data-type="` + detail['type'] + `" data-json='` + data + `'>
-	  	<img src="img/` + userName + `.jpg" width="45px" height="45px" class="user_cover">
-	  	<div class="alert alert-primary msg_content" role="alert" >
-	  		<div class="arrow"></div>
-	  		` + html + `
-		</div>
-	  </div>`);
+        <img src="img/` + userName + `.jpg" width="45px" height="45px" class="user_cover">
+        <div class="alert alert-primary msg_content" role="alert" >
+            <div class="arrow"></div>
+            ` + html + `
+        </div>
+      </div>`);
     }
 }
 
 function dom_addMsg(userName, msg) {
     insertHtml(`<div class="msg float-right ">
-  	<img src="img/` + userName + `.jpg" width="45px" height="45px" class="user_cover" title="` + userName + `">
-  	<div class="alert alert-primary msg_content" role="alert" >
-  		<div class="arrow"></div>
-  		` + msg + `
-	</div>
+    <img src="img/` + userName + `.jpg" width="45px" height="45px" class="user_cover" title="` + userName + `">
+    <div class="alert alert-primary msg_content" role="alert" >
+        <div class="arrow"></div>
+        ` + msg + `
+    </div>
   </div>`);
 }
 
@@ -612,10 +616,6 @@ function insertHtml(html) {
     soundTip('./res/pop.mp3');
 }
 
-function setCopyText(text) {
-    $('#clipboard_content').val(text);
-    $('#modal_copy').modal('show');
-}
 
 function confirm(text, params = {
     ok: function() {},
@@ -724,26 +724,26 @@ function search(type, name) {
                                 detail['album'] = ''; // 没有专辑信息
                             }
                             html += `<li class="list-group-item" data-type="music" data-source="` + detail['source'] + `" data-json='` + JSON.stringify(detail) + `'>
-					  	<div class="row">
-					  		<div class="col-3">
-					      		<img class="lazyload" src='` + detail['pic'] + `' width="100px" height="100px">
-					  			
-					  		</div>
-					  		<div class="col-9 text-left" style="line-height: 33px;">
-					  			` + detail['name'] + `</br>
-					  			` + detail['album'] + `</br>
-					  			` + detail['artist'] + `</br>
-					  			` + detail['source'] + `
-					  		</div>
-					  		
-					  	</div>
-					  	<div class="d-flex justify-content-end">
-					  			<svg xmlns="http://www.w3.org/2000/svg" data-action="play" width="30" height="30" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
-								  <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
-								</svg>
-								<button data-action="sendMedia" class="btn btn-primary">発信</button>
-					  		</div>
-					  </li>`;
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="lazyload" src='` + detail['pic'] + `' width="100px" height="100px">
+                                
+                            </div>
+                            <div class="col-9 text-left" style="line-height: 33px;">
+                                ` + detail['name'] + `</br>
+                                ` + detail['album'] + `</br>
+                                ` + detail['artist'] + `</br>
+                                ` + detail['source'] + `
+                            </div>
+                            
+                        </div>
+                        <div class="d-flex justify-content-end">
+                                <svg xmlns="http://www.w3.org/2000/svg" data-action="play" width="30" height="30" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
+                                  <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                                </svg>
+                                <button data-action="sendMedia" class="btn btn-primary">発信</button>
+                            </div>
+                      </li>`;
                         }
                         $('#list_' + type + ' ul').append(html).
                         find('.lazyload').lazyload({ effect: "fadeIn" });
@@ -758,21 +758,21 @@ function search(type, name) {
                 html = '';
                 for (var detail of json) {
                     html += `<li class="list-group-item" data-type="video" data-source="` + detail['source'] + `" data-json='` + JSON.stringify(detail) + `'>
-					  	<div class="row">
-					  		<div class="col-3">
-					      		<img class="lazyload" src='` + detail['pic'] + `' width="100px" height="100px">
-					  			
-					  		</div>
-					  		<div class="col-9 text-left" style="line-height: 33px;">
-					  			` + detail['name'] + `</br>
-					  			` + detail['artist'] + `
-					  		</div>
-					  		
-					  	</div>
-					  	<div class="d-flex justify-content-end">
-								<button data-action="sendMedia" class="btn btn-primary">発信</button>
-					  		</div>
-					  </li>`;
+                        <div class="row">
+                            <div class="col-3">
+                                <img class="lazyload" src='` + detail['pic'] + `' width="100px" height="100px">
+                                
+                            </div>
+                            <div class="col-9 text-left" style="line-height: 33px;">
+                                ` + detail['name'] + `</br>
+                                ` + detail['artist'] + `
+                            </div>
+                            
+                        </div>
+                        <div class="d-flex justify-content-end">
+                                <button data-action="sendMedia" class="btn btn-primary">発信</button>
+                            </div>
+                      </li>`;
                 }
                 $('#list_' + type + ' ul').html(html).
                 find('.lazyload').lazyload({ effect: "fadeIn" });
