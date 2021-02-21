@@ -16,7 +16,6 @@
     <meta name="x5-page-mode" content="app">
     <link rel="shortcut icon" href="favicon.ico">
     <meta name="Author" contect="liaoyanjie2000@gmail.com">
-    <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/bootstrap-grid.min.css">
     <link rel="stylesheet" href="css/hsycmsAlert.css">
@@ -185,7 +184,7 @@
             </div>
         </div>
     </div>
-    <div class="container" style="display: unset;">
+    <div id="container">
         <!-- <div class="msg float-right ">
   	<img src="img/maki.jpg" width="45px" height="45px" class="user_cover">
   	<div class="alert alert-primary msg_content" role="alert" >
@@ -194,7 +193,7 @@
 	</div>
   </div> -->
     </div>
-    <div class="fixed-bottom p-2">
+    <div id="view" class="p-2">
     	 <div class="cover_list row p-2">
             <div class="col-2 text-center" data-action="selectUser" data-user="maki">
                  <img style="border-radius: 50%;" src='img/maki.jpg' width="45" height="45">
@@ -206,7 +205,10 @@
             </div>
         </div>
 
-         <div id="mse"></div>
+         <div id="mse">
+         	
+
+         </div>
     
         <div class="player row p-2" style="background-color: rgba(0, 0, 0, 0.2);">
             <div class="col-2">
@@ -241,6 +243,7 @@
             </div>
            
         </div>
+        <div id="inputArea" >
     <div class="row text-center pb-1">
         <div class="col-8">
             <input type="text" id="input_text" class="w-100" onkeydown="if(event.keyCode == 13) $('button[data-action=sendMsg]')[0].click();">
@@ -261,7 +264,7 @@
         	
         </div>
 
-         <div class="row">
+         <div class="row" id="icon_bar">
         <div class="col-2">
             <svg data-action="selectMusic" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-music-note-beamed" viewBox="0 0 16 16">
                 <path d="M6 13c0 1.105-1.12 2-2.5 2S1 14.105 1 13c0-1.104 1.12-2 2.5-2s2.5.896 2.5 2zm9-2c0 1.105-1.12 2-2.5 2s-2.5-.895-2.5-2 1.12-2 2.5-2 2.5.895 2.5 2z" />
@@ -299,6 +302,7 @@
         </div>
     </div>
     </div>
+</div>
     </div>
     <!-- 弹窗插件 -->
     <!--普通弹窗-->
