@@ -98,22 +98,8 @@ function init() {
                 break;
 
             case 'danmu':
-                var danmu = _video.addElement(JSON.parse(params[2]));
-                var danmuS = _video.getElement(danmu);
-                var obj = {
-                    element: danmu,
-                    parameter: 'x',
-                    static: true, //是否禁止其它属性，true=是，即当x(y)(alpha)变化时，y(x)(x,y)在播放器尺寸变化时不允许变化
-                    effect: 'None.easeOut',
-                    start: null,
-                    end: -danmuS['width'],
-                    speed: 10,
-                    overStop: true,
-                    pauseStop: true,
-                    callBack: 'deleteChild'
-                };
-                var danmuAnimate = _video.animate(obj);
-                break;
+               _video.danmaku.sendDanmu(JSON.parse(params[2]));
+			  break;
 
             case 'leave':
                 updateStatus(params[1], 'offline', 'bg-secondary');
@@ -228,13 +214,13 @@ function init() {
         var dom = $(this);
         onAction(dom, dom.attr('data-action'));
     })
-    .on('focus', '#input_danmu', function(event) { // 输入弹幕时强制不隐藏控件栏
+ /*   .on('focus', '#input_danmu', function(event) { // 输入弹幕时强制不隐藏控件栏
            $("#mse > div > div:nth-child(2)").addClass('_show');
            $("#mse > div > div:nth-child(3)").addClass('_show');
     })
     .on('blur', '#input_danmu', function(event) {
             $('._show').removeClass('_show');
-    });
+    });*/
     $('.progress').click(function(event) {
         if (_audio.duration) _audio.currentTime = event.originalEvent.offsetX / $(this).width() * _audio.duration;
     });
@@ -279,57 +265,73 @@ function init() {
 }
 
 
-function loadedHandler(name) {
+function loadedHandler() {
     //调用到该函数后说明播放器已加载成功，可以进行部分控制了。此时视频还没有加载完成，所以不能控制视频的播放，暂停，获取元数据等事件
-    _video.addListener('error', () => {
+    _video.on('error', () => {
         //queryMsg('status||' + g_config.user + '||faild||bg-danger');
     });
-    _video.addListener('time', () => {
-        var pro = _video.V.currentTime / _video.V.duration * 100;
+    _video.on('timeupdate', () => {
+        var pro = _video.video.currentTime / _video.video.duration * 100;
         if (!isNaN(pro)) {
             queryMsg('status||' + g_config.user + '||' + pro + '||bg-info');
 
         }
     });
-    _video.addListener('loadedmetadata', () => {
+    _video.on('loadstart', () => {
         queryMsg('status||' + g_config.user + '||ok||bg-success');
         /*if (g_playing.target) {
             console.log('调整到 ' + g_playing.target);
-            _video.V.currentTime = g_playing.target * _video.V.duration;
+            _video.video.currentTime = g_playing.target * _video.video.duration;
             g_playing.target = undefined;
         }*/
     });
-    _video.addListener('ended', () => {
-        if (_video.V.duration > 0) {
+    _video.on('ended', () => {
+        if (_video.video.duration > 0) {
             queryMsg('status||' + g_config.user + '||終了||bg-light');
         }
     });
-     _video.addListener('full', (b) => {
+    _video.danmaku.sendDanmu = _video.danmaku.send;
+    _video.danmaku.send = (o, f) => {
+    	$('.dplayer-comment-input').val('');
+    	sendDanmu(o.text);
+    	return false;
+    }
+
+   /*  _video.on('full', (b) => {
         if(b){ // 全屏显示弹幕输入控件
             $('[data-title=点击播放]').parent().append($(`<input clas="mt-2" style="width: 300px;margin-top: 5px;margin-left:200px" type="text" id="input_danmu" placeholder="ご感想を" onkeydown="if(event.keyCode == 13 && !event.ctrlKey){sendDanmu(this.value);this.value = '';}">`));
         }else{
             $('#input_danmu').remove();
         }
-    });
+    });*/
 }
 
 function loadVideo(url, poster = '') {
     if(!poster) poster = '.img/loading.gif';
     var config = {
-        container: '#mse', //“#”代表容器的ID，“.”或“”代表容器的class
-        variable: '_video', //播放函数名称，该属性必需设置，值等于下面的new ckplayer()的对象
-        loaded: 'loadedHandler', //播放器加载完成后调用该函数
-        volume: 1, //音量，范围：0-1
-         mobileCkControls: true,
-        html5m3u8: url.indexOf('.m3u8') != -1,
-        poster: poster,
-        video: url, //视频地址
+	    container: $('#mse')[0],
+	    autoplay: true,
+	    volume: 1,
+	    lang: 'en',
+	    video: {
+	        url: url,
+	        pic: poster,
+	    },
+	     danmaku: {
+        id: 'demo',
+    },
+	    subtitle: {
+	        // url: 'webvtt.vtt',
+	    }
     };
     if (!_video) {
-        _video = new ckplayer(config);
+        _video = new DPlayer(config);
+        loadedHandler();
     } else {
-        _video.newVideo(config);
+        _video.switchVideo(config.video);
     }
+
+
 }
 
 function shareLink() {
@@ -422,21 +424,6 @@ function onAction(dom, action) {
             parseMusic(JSON.parse(dom.parents('[data-json]').attr('data-json')));
             break;
 
-        case 'sendDanmu':
-            var msg;
-            var dm = $('#danmu_selecter option:selected');
-            if (dm.length > 0 && !dm.prop('disabled')) {
-                msg = dm.html();
-                $('#danmu_selecter option:nth-child(1)').prop('selected', true);
-            } else {
-                msg = $('#input_text').val();
-                $('#input_text').val('');
-            }
-            if (msg != '') {
-                sendDanmu(msg);
-            }
-            break;
-
         case 'sendMsg':
             var msg = $('#input_text').val();
             if (msg != '') {
@@ -469,7 +456,7 @@ function onAction(dom, action) {
                     g_playing.target = pro;
                 } else {
                     if (g_playing.data.type == 'video') {
-                        _video.V.currentTime = pro * _video.V.duration;
+                        _video.video.currentTime = pro * _video.video.duration;
                     } else {
                         _audio.currentTime = pro * _audio.duration;
                     }
@@ -486,49 +473,12 @@ function onAction(dom, action) {
 }
 
 function sendDanmu(msg) {
-    var danmuObj = {
-        list: [{
-            type: 'image', //定义元素类型：只有二种类型，image=使用图片，text=文本
-            file: $('.navbar-brand img').attr('src'), //图片地址
-            radius: 30, //图片圆角弧度
-            width: 30, //定义图片宽，必需要定义
-            height: 30, //定义图片高，必需要定义
-            alpha: 0.9, //图片透明度(0-1)
-            marginLeft: 10, //图片离左边的距离
-            marginRight: 10, //图片离右边的距离
-            marginTop: 10, //图片离上边的距离
-            marginBottom: 10, //图片离下边的距离
-            clickEvent: ""
-        }, {
-            type: 'text', //说明是文本
-            text: msg, //文本内容
-            color: '0xFFDD00', //文本颜色
-            size: 14, //文本字体大小，单位：px
-            font: '"Microsoft YaHei", YaHei, "微软雅黑", SimHei,"\5FAE\8F6F\96C5\9ED1", "黑体",Arial', //文本字体
-            leading: 30, //文字行距
-            alpha: 1, //文本透明度(0-1)
-            paddingLeft: 10, //文本内左边距离
-            paddingRight: 10, //文本内右边距离
-            paddingTop: 0, //文本内上边的距离
-            paddingBottom: 0, //文本内下边的距离
-            marginLeft: 0, //文本离左边的距离
-            marginRight: 10, //文本离右边的距离
-            marginTop: 10, //文本离上边的距离
-            marginBottom: 0, //文本离下边的距离
-            backgroundColor: '0xFF0000', //文本的背景颜色
-            backAlpha: 0.5, //文本的背景透明度(0-1)
-            backRadius: 30, //文本的背景圆角弧度
-            clickEvent: "actionScript->videoPlay"
-        }],
-        x: '100%', //x轴坐标
-        y: 20, //y轴坐标
-        //position:[2,1,0],//位置[x轴对齐方式（0=左，1=中，2=右），y轴对齐方式（0=上，1=中，2=下），x轴偏移量（不填写或null则自动判断，第一个值为0=紧贴左边，1=中间对齐，2=贴合右边），y轴偏移量（不填写或null则自动判断，0=紧贴上方，1=中间对齐，2=紧贴下方）]
-        alpha: 1,
-        //backgroundColor:'#FFFFFF',
-        backAlpha: 0.8,
-        backRadius: 30 //背景圆角弧度
-    }
-    queryMsg('danmu||' + g_config.user + '||' + JSON.stringify(danmuObj));
+	 // $('.navbar-brand img').attr('src')
+    queryMsg('danmu||' + g_config.user + '||' + JSON.stringify({
+        text: g_config.user + ':' + msg,
+        color: '#b7daff',
+        type: 'right', // should be `top` `bottom` or `right`
+    }));
 }
 
 function parseMusic(json) {
@@ -541,7 +491,7 @@ function parseMusic(json) {
     g_playing.data = json;
     queryMsg('status||' + g_config.user + '||loading||bg-light');
     if (json['type'] == 'music') {
-        if (_video) _video.V.src = '';
+        if (_video) _video.video.src = '';
         $('#danmu_bar').hide();
         $('#mse').hide();
         $('.player').show();
