@@ -75,7 +75,7 @@ function init() {
         }, 5000);
         queryMsg('list');
         checkOnline();
-        
+
         // queryMsg('sendMedia||maki||{"name":"グランドイリュージョン","ablum":"","artist":"","url":"https://s750.clipwatching.com/hls/zx5xsntp4f2txcne4y5clgp23jjjuem22527btq55cxxiku6qx6y2as3pgjq/index-v1-a1.m3u8","pic":"https://easy-movie.com/wp-content/uploads/2019/07/IMG_2581.jpg","type":"video"}');
 
         // queryMsg('sendMedia||maki||{"name":"僕たちの七日間戦争","ablum":"","artist":"","url":"https://youku.cdn7-okzy.com/20200325/18173_e01b3f41/1000k/hls/index.m3u8","pic":"https://img2.nysk.fj.cn/pic/tt27imgs/2020-3/1585121440.jpg","type":"video"}');
@@ -98,8 +98,8 @@ function init() {
                 break;
 
             case 'danmu':
-               _video.danmaku.sendDanmu(JSON.parse(params[2]));
-			  break;
+                _video.danmaku.sendDanmu(JSON.parse(params[2]));
+                break;
 
             case 'leave':
                 updateStatus(params[1], 'offline', 'bg-secondary');
@@ -162,7 +162,7 @@ function init() {
 
     _audio = $('audio')[0];
     _audio.onerror = (e) => {
-       // queryMsg('status||' + g_config.user + '||faild||bg-danger');
+        // queryMsg('status||' + g_config.user + '||faild||bg-danger');
     }
     _audio.ontimeupdate = (e) => {
         var pro = _audio.currentTime / _audio.duration * 100;
@@ -214,38 +214,38 @@ function init() {
         var dom = $(this);
         onAction(dom, dom.attr('data-action'));
     })
- /*   .on('focus', '#input_danmu', function(event) { // 输入弹幕时强制不隐藏控件栏
-           $("#mse > div > div:nth-child(2)").addClass('_show');
-           $("#mse > div > div:nth-child(3)").addClass('_show');
-    })
-    .on('blur', '#input_danmu', function(event) {
-            $('._show').removeClass('_show');
-    });*/
+    /*   .on('focus', '#input_danmu', function(event) { // 输入弹幕时强制不隐藏控件栏
+              $("#mse > div > div:nth-child(2)").addClass('_show');
+              $("#mse > div > div:nth-child(3)").addClass('_show');
+       })
+       .on('blur', '#input_danmu', function(event) {
+               $('._show').removeClass('_show');
+       });*/
     $('.progress').click(function(event) {
         if (_audio.duration) _audio.currentTime = event.originalEvent.offsetX / $(this).width() * _audio.duration;
     });
 
-      $(window).resize(function(event) {
+    $(window).resize(function(event) {
         var w = $(this).width();
         var h = $(this).height();
-        if(w > h){
+        if (w > h) {
             $('#container').addClass('width'); // 显示滚动条
             $('#view').addClass('width-view');
 
-            if(h < 600){
-               $('#inputArea').addClass('inputArea_top');
-            }else{
+            if (h < 600) {
+                $('#inputArea').addClass('inputArea_top');
+            } else {
                 $('#inputArea').removeClass('inputArea_top');
             }
-        }else{
+        } else {
 
-             $('#inputArea').removeClass('inputArea_top');
+            $('#inputArea').removeClass('inputArea_top');
             $('#container').removeClass('width').removeClass('_normal').css('height', '');
             $('#view').removeClass('width-view');
 
-            if(h < 720){
+            if (h < 720) {
                 $('#danmu_bar, #icon_bar').hide();
-            }else{
+            } else {
                 $('#danmu_bar, #icon_bar').show();
             }
         }
@@ -292,37 +292,37 @@ function loadedHandler() {
     });
     _video.danmaku.sendDanmu = _video.danmaku.send;
     _video.danmaku.send = (o, f) => {
-    	$('.dplayer-comment-input').val('');
-    	sendDanmu(o.text);
-    	return false;
+        $('.dplayer-comment-input').val('');
+        sendDanmu(o.text, o.color, o.type);
+        return false;
     }
 
-   /*  _video.on('full', (b) => {
-        if(b){ // 全屏显示弹幕输入控件
-            $('[data-title=点击播放]').parent().append($(`<input clas="mt-2" style="width: 300px;margin-top: 5px;margin-left:200px" type="text" id="input_danmu" placeholder="ご感想を" onkeydown="if(event.keyCode == 13 && !event.ctrlKey){sendDanmu(this.value);this.value = '';}">`));
-        }else{
-            $('#input_danmu').remove();
-        }
-    });*/
+    /*  _video.on('full', (b) => {
+         if(b){ // 全屏显示弹幕输入控件
+             $('[data-title=点击播放]').parent().append($(`<input clas="mt-2" style="width: 300px;margin-top: 5px;margin-left:200px" type="text" id="input_danmu" placeholder="ご感想を" onkeydown="if(event.keyCode == 13 && !event.ctrlKey){sendDanmu(this.value);this.value = '';}">`));
+         }else{
+             $('#input_danmu').remove();
+         }
+     });*/
 }
 
 function loadVideo(url, poster = '') {
-    if(!poster) poster = '.img/loading.gif';
+    if (!poster) poster = '.img/loading.gif';
     var config = {
-	    container: $('#mse')[0],
-	    autoplay: true,
-	    volume: 1,
-	    lang: 'en',
-	    video: {
-	        url: url,
-	        pic: poster,
-	    },
-	     danmaku: {
-        id: 'demo',
-    },
-	    subtitle: {
-	        // url: 'webvtt.vtt',
-	    }
+        container: $('#mse')[0],
+        autoplay: true,
+        volume: 1,
+        lang: 'en',
+        video: {
+            url: url,
+            pic: poster,
+        },
+        danmaku: {
+            id: 'demo',
+        },
+        subtitle: {
+            // url: 'webvtt.vtt',
+        }
     };
     if (!_video) {
         _video = new DPlayer(config);
@@ -380,10 +380,25 @@ function onAction(dom, action) {
             }
             break;
 
+        case 'sendDanmu':
+            var msg;
+            var dm = $('#danmu_selecter option:selected');
+            if (dm.length > 0 && !dm.prop('disabled')) {
+                msg = dm.html();
+                $('#danmu_selecter option:nth-child(1)').prop('selected', true);
+            } else {
+                msg = $('#input_text').val();
+                $('#input_text').val('');
+            }
+            if (msg != '') {
+                sendDanmu(msg);
+            }
+            break;
+
+
         case 'fitler_site':
             var site = dom.val();
             var selected = dom.prop('checked');
-            console.log(site, selected);
             dom.parents('.modal-body').find('ul li').each((i, d) => {
                 if ($(d).attr('data-source') == site) {
                     $(d).css('display', selected ? 'unset' : 'none');
@@ -447,7 +462,6 @@ function onAction(dom, action) {
         case 'selectUser':
             var user = dom.attr('data-user');
             var pro = dom.find('.badge').attr('data-time') / 100;
-            console.log(pro);
             if (pro > 0) {
                 pro += 0.0005; //偏差
                 var json = JSON.parse(g_listPlayer[user]);
@@ -472,12 +486,12 @@ function onAction(dom, action) {
 
 }
 
-function sendDanmu(msg) {
-	 // $('.navbar-brand img').attr('src')
+function sendDanmu(msg, color = '#b7daff', type = 'right') {
+    // $('.navbar-brand img').attr('src')
     queryMsg('danmu||' + g_config.user + '||' + JSON.stringify({
         text: g_config.user + ':' + msg,
-        color: '#b7daff',
-        type: 'right', // should be `top` `bottom` or `right`
+        color: color,
+        type: type, // should be `top` `bottom` or `right`
     }));
 }
 
@@ -550,11 +564,11 @@ function dom_addMedia(userName, data) {
     switch (detail['type']) {
         case 'music':
             html = `
-            <div class="card mb-2" style="width: 18rem;margin: 0 auto;" data-json='`+data+`'>
+            <div class="card mb-2" style="width: 18rem;margin: 0 auto;" data-json='` + data + `'>
               <img src='` + detail['pic'] + `' height="300px" class="card-img-top" alt="...">
               <div class="card-body">
                  <div style="width: 100%;margin: 0 auto;display: inline-grid">
-                    <img class="user_icon" src="`+g_datas.user[userName].icon +`" style="margin: 0 auto;">
+                    <img class="user_icon" src="` + g_datas.user[userName].icon + `" style="margin: 0 auto;">
                 </div>
                 <h5 class="card-title"> ` + detail['name'] + `</h5>
                 <p class="card-text">` + detail['album'] + `</p>
@@ -569,11 +583,11 @@ function dom_addMedia(userName, data) {
 
         case 'video':
             html = `
-            <div class="card mb-2" style="width: 18rem;margin: 0 auto;" data-json='`+data+`'>
+            <div class="card mb-2" style="width: 18rem;margin: 0 auto;" data-json='` + data + `'>
               <img src='` + detail['pic'] + `' height="300px" class="card-img-top" alt="...">
               <div class="card-body">
                  <div style="width: 100%;margin: 0 auto;display: inline-grid">
-                    <img class="user_icon" src="`+g_datas.user[userName].icon +`" style="margin: 0 auto;">
+                    <img class="user_icon" src="` + g_datas.user[userName].icon + `" style="margin: 0 auto;">
                 </div>
                 <h5 class="card-title"> ` + detail['name'] + `</h5>
                 <p class="card-text">` + detail['artist'] + `</p>
@@ -610,10 +624,10 @@ function insertHtml(html) {
     var con = $('#container').append(html);
     var h = con[0].scrollHeight;
     con.animate({ scrollTop: h + 'px' }, 0);;
-    if(h > $(window).height() - 60 && con.hasClass('width')){
-       con.addClass('_normal'); // 显示滚动条
-    }else{
-        if(con.hasClass('width')){
+    if (h > $(window).height() - 60 && con.hasClass('width')) {
+        con.addClass('_normal'); // 显示滚动条
+    } else {
+        if (con.hasClass('width')) {
             con.removeClass('_normal').height(h); // 扩大高度
         }
     }
@@ -798,7 +812,6 @@ function searchLyric(url) {
     g_lrcs = [];
     $.getJSON(url, function(json, textStatus) {
         if (textStatus == 'success') {
-            console.log(json);
             var lrc, tlrc, time, detail;
             if (json.lyric) lrc = json.lyric.split("\n");
             if (json.tlyric) tlrc = json.tlyric.split("\n");
