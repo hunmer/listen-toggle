@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>listen toggle</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+    <meta http-equiv="Content-Security-Policy" content="block-all-mixed-content">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="full-screen" content="yes">
+    <meta name="browsermode" content="application">
+    <meta name="x5-fullscreen" content="true">
+    <meta name="x5-page-mode" content="app">
+    <link rel="shortcut icon" href="favicon.ico">
+    <meta name="Author" contect="liaoyanjie2000@gmail.com">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="css/x0popup.min.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body style="background-image: url(./img/background.png);">
+    <div id="ftb" class="round btn-primary" style="position: fixed; right: 7%;bottom: 12%;height: 50px;width: 50px;padding: 10px;z-index: 99999999;cursor: pointer;">
+            <span class="badge badge-warning round" style="position: absolute; right:0%;"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-mic" viewBox="0 0 16 16" >
+      <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
+      <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0v5zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3z"/>
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" style="display: none;" fill="currentColor" class="bi bi-mic-fill" viewBox="0 0 16 16">
+  <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z"/>
+  <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
+</svg>
+    </div>
+
+    <div class="modal fade text-center" tabindex="9999" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" id="modal_music" style="z-index: 9999">
+        <div class="modal-dialog">
+            <div class="modal-content  p-3">
+                <div class="modal-header">
+                    <h5 class="modal-title">音楽</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <input class="col-10" style="width: 80%" type="text" id="input_music" placeholder="名前" value="猫" onkeydown="if(event.keyCode == 13) $('#btn_search_music')[0].click();">
+                            <button id="btn_search_music" onclick="search('music', $('#input_music').val())" class="btn btn-success col-2">検索</button>
+                            <div class="checkbox_list">
+                            <div class="form-check form-check-inline">
+							  <input class="form-check-input" onchange="var b = this.checked;$(this).parents('.checkbox_list').find('input[type=checkbox]').prop('checked', b);" type="checkbox" id="check_all">
+							  <label class="form-check-label" for="check_all">all</label>
+							</div>
+							<div class="form-check form-check-inline">
+							  <input data-action="fitler_site" class="form-check-input" type="checkbox" id="check_netease" value="netease" checked>
+							  <label class="form-check-label" for="check_netease">netease</label>
+							</div>
+							<div class="form-check form-check-inline">
+							  <input data-action="fitler_site" class="form-check-input" type="checkbox" id="check_tencent" value="tencent">
+							  <label class="form-check-label" for="check_tencent">tencent</label>
+							</div>
+							<div class="form-check form-check-inline">
+							  <input data-action="fitler_site" class="form-check-input" type="checkbox" id="check_xiami" value="xiami">
+							  <label class="form-check-label" for="check_xiami">xiami</label>
+							</div>
+							<div class="form-check form-check-inline">
+							  <input data-action="fitler_site"  class="form-check-input" type="checkbox" id="check_youtube" value="youtube" checked>
+							  <label class="form-check-label" for="check_youtube">youtube</label>
+							</div>
+							<div class="form-check form-check-inline">
+							  <input data-action="fitler_site" class="form-check-input" type="checkbox" id="check_kugou" value="kugou">
+							  <label class="form-check-label" for="check_kugou">kugou</label>
+							</div>
+							<div class="form-check form-check-inline">
+							  <input data-action="fitler_site" class="form-check-input" type="checkbox" id="check_baidu" value="baidu">
+							  <label class="form-check-label" for="check_baidu">baidu</label>
+							</div>
+
+							</div>
+				                        </div>
+                        <div class="row" id="list_music">
+                            <ul class="list-group list-group-flush">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade text-center" tabindex="9999" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" id="modal_video" style="z-index: 9999">
+        <div class="modal-dialog">
+            <div class="modal-content p-3">
+                <div class="modal-header">
+                    <h5 class="modal-title">動画</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <input class="col-10" style="width: 80%" type="text" id="input_video" placeholder="名前" value="猫" onkeydown="if(event.keyCode == 13) $('#btn_search_music')[0].click();">
+                            <button id="btn_search_music" onclick="search('video', $('#input_video').val())" class="btn btn-success col-2">検索</button>
+                        </div>
+                        <div class="row" id="list_video">
+                            <ul class="list-group list-group-flush">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade text-center" tabindex="9999" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" id="modal_link" style="z-index: 9999">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">リンク</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                        	<select class="form-select col-3" id="share_select">
+							  <option value="video" selected>URL</option>
+							  <option value="video">Video</option>
+							  <option value="audio">Audio</option>
+							  <option value="image">Image</option>
+							</select>
+                            <input class="col-7" style="width: 80%" type="text" id="input_link" placeholder="..." value="https://www.youtube.com/watch?v=d86hKJNehI8">
+                            <button id="btn_share_link" onclick="shareLink()" class="btn btn-success col-2">発信</button>
+
+                            <div class="mt-3 col-12">
+							  <label for="input_name" class="form-label">Title</label>
+							  <input style="width: 100%" type="text" id="input_name" placeholder="Title" value="">
+							</div>
+
+							<div class="mt-3 col-12">
+							  <label for="input_artist" class="form-label">Artits</label>
+							  <input style="width: 100%" type="text" id="input_artist" placeholder="Artits" value="">
+							</div>
+
+							<div class="mt-3 col-12">
+							  <label for="input_album" class="form-label">Album</label>
+							  <input style="width: 100%" type="text" id="input_album" placeholder="Alubm" value="">
+							</div>
+
+							<div class="mt-3 col-12">
+							  <label for="input_cover" class="form-label">Cover</label>
+							  <input style="width: 100%" type="text" id="input_cover" placeholder="Cover" value="./img/cover.webp">
+							</div>
+
+                            <div class="mt-3 col-12">
+                              <label for="input_cover" class="form-label">Sub</label>
+                              <input style="width: 100%" type="text" id="input_sub" placeholder="Sub" value="">
+                            </div>
+						
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-light ">
+        <a class="navbar-brand" href="#"><img class="round mr-2" src="./img/default.png" width="30px" height="30px">
+            <span class="badge badge-secondary">...</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse text-center" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" href="javascript: loginOut()">Login out</a>
+            </div>
+        </div>
+    </nav>
+    <div class="modal fade" id="modal_user" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">名前を入力下さい！</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">名前</label>
+                        <input type="text" class="form-control" id="input_user" onkeydown="if(event.keyCode == 13) checkUser();">
+                        <div class="valid-feedback"></div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="checkUser();">確認</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="container">
+        <!-- <div class="msg float-right ">
+  	<img src="img/maki.jpg" width="45px" height="45px" class="user_cover">
+  	<div class="alert alert-primary msg_content" role="alert" >
+  		<div class="arrow"></div>
+  		hello
+	</div>
+  </div> -->
+    </div>
+    <div id="view" class="p-2">
+    	 <div class="cover_list row p-2">
+            <div class="col-2 text-center" data-action="selectUser" data-user="maki">
+                 <img style="border-radius: 50%;" src='img/maki.jpg' width="45" height="45">
+                <span class="badge bg-secondary">offline</span>
+            </div>
+            <div class="col-2" data-action="selectUser" data-user="chisato">
+                 <img style="border-radius: 50%;" src='img/chisato.jpg' width="45" height="45">
+                <span class="badge bg-secondary">offline</span>
+            </div>
+        </div>
+
+         <div id="mse">
+         </div>
+
+        <div class="player row p-2" style="background-color: rgba(0, 0, 0, 0.2);">
+            <div class="col-2">
+                <img id="music_cover" class="lazyload" src='img/maki.jpg' width="70" height="70">
+            </div>
+            <div class="col-10 text-center">
+                <span id="music_name"></span><hr style="margin: 0">
+                <span id="music_lyric"></span></br>
+            </div>
+            <div class="col-7 progress pl-0 ml-3 mt-2">
+		  <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+		</div>
+            <div class="col-auto text-center">
+            	  <svg data-action="volume" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-volume-up-fill" viewBox="0 0 16 16">
+  <path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
+  <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/>
+  <path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
+</svg>
+          <svg data-action="up" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-hand-thumbs-up-fill" viewBox="0 0 16 16">
+  <path d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.964.22.817.533 2.512.062 4.51a9.84 9.84 0 0 1 .443-.05c.713-.065 1.669-.072 2.516.21.518.173.994.68 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.162 3.162 0 0 1-.488.9c.054.153.076.313.076.465 0 .306-.089.626-.253.912C13.1 15.522 12.437 16 11.5 16H8c-.605 0-1.07-.081-1.466-.218a4.826 4.826 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.616.849-.231 1.574-.786 2.132-1.41.56-.626.914-1.279 1.039-1.638.199-.575.356-1.54.428-2.59z"/>
+</svg>
+<svg data-action="down" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-hand-thumbs-down-fill" viewBox="0 0 16 16">
+  <path d="M6.956 14.534c.065.936.952 1.659 1.908 1.42l.261-.065a1.378 1.378 0 0 0 1.012-.965c.22-.816.533-2.512.062-4.51.136.02.285.037.443.051.713.065 1.669.071 2.516-.211.518-.173.994-.68 1.2-1.272a1.896 1.896 0 0 0-.234-1.734c.058-.118.103-.242.138-.362.077-.27.113-.568.113-.856 0-.29-.036-.586-.113-.857a2.094 2.094 0 0 0-.16-.403c.169-.387.107-.82-.003-1.149a3.162 3.162 0 0 0-.488-.9c.054-.153.076-.313.076-.465a1.86 1.86 0 0 0-.253-.912C13.1.757 12.437.28 11.5.28H8c-.605 0-1.07.08-1.466.217a4.823 4.823 0 0 0-.97.485l-.048.029c-.504.308-.999.61-2.068.723C2.682 1.815 2 2.434 2 3.279v4c0 .851.685 1.433 1.357 1.616.849.232 1.574.787 2.132 1.41.56.626.914 1.28 1.039 1.638.199.575.356 1.54.428 2.591z"/>
+</svg>
+            <svg xmlns="http://www.w3.org/2000/svg" data-action="switch" width="20" height="20" fill="currentColor" class="bi bi-stop-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5h-3z" />
+            </svg>
+<svg data-action="download" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+</svg>
+            </div>
+           
+        </div>
+        <div id="inputArea" >
+    <div class="row text-center pb-1">
+        <div class="col-8">
+            <input type="text" id="input_text" class="w-100" onkeydown="if(event.keyCode == 13) $('button[data-action=sendMsg]')[0].click();">
+        </div>
+        	<button data-action="sendMsg" class="btn-primary col-4 w-100">発信</button>
+        </div>
+        <div class="row" id="danmu_bar">
+        	<select class="form-select col-8" id='danmu_selecter'>
+			  <option selected disabled>弾幕を選ぶ</option>
+			  <option>wwww</option>
+			  <option>いいね！</option>
+			  <option>そんな…</option>
+			  <option>888888</option>
+			</select>
+			<button data-action="sendDanmu" class="btn-primary col-4 w-100 " ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-quote-fill" viewBox="0 0 16 16">
+<path d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM7.194 6.766a1.688 1.688 0 0 0-.227-.272 1.467 1.467 0 0 0-.469-.324l-.008-.004A1.785 1.785 0 0 0 5.734 6C4.776 6 4 6.746 4 7.667c0 .92.776 1.666 1.734 1.666.343 0 .662-.095.931-.26-.137.389-.39.804-.81 1.22a.405.405 0 0 0 .011.59c.173.16.447.155.614-.01 1.334-1.329 1.37-2.758.941-3.706a2.461 2.461 0 0 0-.227-.4zM11 9.073c-.136.389-.39.804-.81 1.22a.405.405 0 0 0 .012.59c.172.16.446.155.613-.01 1.334-1.329 1.37-2.758.942-3.706a2.466 2.466 0 0 0-.228-.4 1.686 1.686 0 0 0-.227-.273 1.466 1.466 0 0 0-.469-.324l-.008-.004A1.785 1.785 0 0 0 10.07 6c-.957 0-1.734.746-1.734 1.667 0 .92.777 1.666 1.734 1.666.343 0 .662-.095.931-.26z"/>
+</svg></button>
+        	
+        </div>
+
+         <div class="row" id="icon_bar">
+        <div class="col-2">
+            <svg data-action="selectMusic" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-music-note-beamed" viewBox="0 0 16 16">
+                <path d="M6 13c0 1.105-1.12 2-2.5 2S1 14.105 1 13c0-1.104 1.12-2 2.5-2s2.5.896 2.5 2zm9-2c0 1.105-1.12 2-2.5 2s-2.5-.895-2.5-2 1.12-2 2.5-2 2.5.895 2.5 2z" />
+                <path fill-rule="evenodd" d="M14 11V2h1v9h-1zM6 3v10H5V3h1z" />
+                <path d="M5 2.905a1 1 0 0 1 .9-.995l8-.8a1 1 0 0 1 1.1.995V3L5 4V2.905z" />
+            </svg>
+        </div>
+        <div class="col-2">
+            <svg data-action="selectVideo" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-youtube" viewBox="0 0 16 16">
+                <path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.007 2.007 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.007 2.007 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31.4 31.4 0 0 1 0 7.68v-.122C.002 7.343.01 6.6.064 5.78l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.007 2.007 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A99.788 99.788 0 0 1 7.858 2h.193zM6.4 5.209v4.818l4.157-2.408L6.4 5.209z" />
+            </svg>
+        </div>
+        <div class="col-2">
+            <svg onclick="$('#modal_link').modal('show')" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16">
+                <path d="M4.715 6.542L3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.001 1.001 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z" />
+                <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 0 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 0 0-4.243-4.243L6.586 4.672z" />
+            </svg>
+        </div>
+        <div class="col-2">
+        	<input id="input_updload" type="file" accept="image/*" style="width:1px;height:1px;cursor:pointer;font-size:30px;outline:medium none;position: absolute;filter:alpha(opacity=0);-moz-opacity:0;opacity:0;left:-10px;top:-10px;" onchange="uploadImage(this.files[0])">
+            <svg data-action="selectImage" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
+                <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54A.505.505 0 0 1 1 12.5v-9a.5.5 0 0 1 .5-.5h13z" />
+            </svg>
+        </div>
+        <div class="col-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-ul" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+            </svg>
+        </div>
+        <div class="col-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+            </svg>
+        </div>
+    </div>
+    </div>
+</div>
+    </div>
+    <audio></audio>
+    <audio id='audio_tip' autoplay></audio>
+    <audio id="record1"></audio>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/until.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/x0popup.min.js"></script>
+<script src="js/lazyload.min.js"></script>
+<script src="js/hls.min.js"></script>
+<script src="js/recorder.js"></script>
+<script src="js/DPlayer.min.js"></script>
+<!-- <script src="ckplayer/ckplayer.min.js"></script> 
+<script src="//sf1-ttcdn-tos.pstatp.com/obj/unpkg/xgplayer/2.9.6/browser/index.js" charset="utf-8"></script>
+<script src="//sf1-ttcdn-tos.pstatp.com/obj/unpkg/xgplayer-mp4/1.1.8/browser/index.js" charset="utf-8"></script>-->
+<script src="js/index.js"></script>
+
+</html>
