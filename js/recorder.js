@@ -51,7 +51,7 @@ function stopClicking(event) {
 
 function startRecord() {
   chunks = [];
-  if(_video.fullScreen.isFullScreen() == undefined){
+  if(!_video || _video.fullScreen.isFullScreen() == undefined){
     $('#ftb').addClass('btn-danger').find('.bi-mic').hide();
     $('#ftb').find('.bi-mic-fill').show();
   }else{
@@ -66,7 +66,7 @@ function startRecord() {
 
     g_click.recordTimer = setInterval(() => {
       var s = getNow() - g_click.startRecord;
-      if(_video.fullScreen.isFullScreen() == undefined){
+      if(!_video || _video.fullScreen.isFullScreen() == undefined){
         $('#ftb .badge').html(s);
       }else{
         $('#recorder_cnt span').html(s);
@@ -76,7 +76,7 @@ function startRecord() {
 
 function stopRecord() {
   clearInterval( g_click.recordTimer);
-  if(_video.fullScreen.isFullScreen() == undefined){
+  if(!_video || _video.fullScreen.isFullScreen() == undefined){
 
     $('#ftb').removeClass('btn-danger').find('.bi-mic').show();
     $('#ftb').find('.bi-mic-fill').hide();
@@ -147,7 +147,7 @@ if (navigator.mediaDevices.getUserMedia) {
 
                 var audioURL = window.URL.createObjectURL(blob);
                 document.querySelector("#record1").src = audioURL;
-                if(_video.fullScreen.isFullScreen() == undefined){
+                if(!_video || _video.fullScreen.isFullScreen() == undefined){
                   x0p({
                       title: '録音確認',
                       html: true,
