@@ -11,20 +11,22 @@ var g_playing = {
     }
 };
 $(function() {
+    x0p({
+        title: 'loading',
+        text: '読み込み中...',
+        animationType: 'slideDown',
+        icon: 'info',
+        buttons: [],
+        autoClose: 999999
+    });
     if (!g_config.user) {
         $('#modal_user').modal('show');
     } else {
-        x0p({
-            title: 'loading',
-            text: '読み込み中...',
-            animationType: 'slideDown',
-            icon: 'info',
-            buttons: [],
-            autoClose: -1
-        });
+        
         setUser(g_config.user);
     }
 });
+
 
 function queryMsg(msg, debug = false) {
     connection.send(msg);
@@ -110,6 +112,7 @@ function init() {
         //queryMsg('sendMedia||maki||{"name":"https://r2---sn-q0c7rn76.googlevideo.com/videoplayback?expire=1619803006&ei=HueLYNj7HqXTxN8P-96JqAM&ip=52.51.105.239&id=o-AHGpziR1rretMycb2ACSRLzMQ6Fxf5jf3wtENteLbuzA&itag=18&source=youtube&requiressl=yes&mh=3H&mm=31%2C26&mn=sn-q0c7rn76%2Csn-5hne6nsk&ms=au%2Conr&mv=m&mvi=2&pl=18&initcwndbps=1085000&vprv=1&mime=video%2Fmp4&ns=PLrzztOjosVZM0Npf1vzLuYF&gir=yes&clen=16997447&ratebypass=yes&dur=333.159&lmt=1598095846489687&mt=1619781165&fvip=2&fexp=24001373%2C24007246&beids=23886210&c=WEB&txp=5531432&n=gK-9CNO-2K_bF2c&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cvprv%2Cmime%2Cns%2Cgir%2Cclen%2Cratebypass%2Cdur%2Clmt&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=AG3C_xAwRQIgYfnWGwI_jckobmrdKp32oakTKs3QWUDe7_l3K5YKpnMCIQC-gihxGRv_OHQsFB7NOdVtwIywHPzrgW0TLVjLB7s0JQ%3D%3D&sig=AOq0QJ8wRQIhAKyepGXEOmG024yGJ3hIlIXZ7PdxgbZLprAklwZ18lLfAiApWK7ZZOoifbCu5HOBE-r2ryLS1zukyPmMEOpLHbEQ9A==","ablum":"","artist":"","url":"https://r2---sn-q0c7rn76.googlevideo.com/videoplayback?expire=1619803006&ei=HueLYNj7HqXTxN8P-96JqAM&ip=52.51.105.239&id=o-AHGpziR1rretMycb2ACSRLzMQ6Fxf5jf3wtENteLbuzA&itag=18&source=youtube&requiressl=yes&mh=3H&mm=31%2C26&mn=sn-q0c7rn76%2Csn-5hne6nsk&ms=au%2Conr&mv=m&mvi=2&pl=18&initcwndbps=1085000&vprv=1&mime=video%2Fmp4&ns=PLrzztOjosVZM0Npf1vzLuYF&gir=yes&clen=16997447&ratebypass=yes&dur=333.159&lmt=1598095846489687&mt=1619781165&fvip=2&fexp=24001373%2C24007246&beids=23886210&c=WEB&txp=5531432&n=gK-9CNO-2K_bF2c&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cvprv%2Cmime%2Cns%2Cgir%2Cclen%2Cratebypass%2Cdur%2Clmt&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=AG3C_xAwRQIgYfnWGwI_jckobmrdKp32oakTKs3QWUDe7_l3K5YKpnMCIQC-gihxGRv_OHQsFB7NOdVtwIywHPzrgW0TLVjLB7s0JQ%3D%3D&sig=AOq0QJ8wRQIhAKyepGXEOmG024yGJ3hIlIXZ7PdxgbZLprAklwZ18lLfAiApWK7ZZOoifbCu5HOBE-r2ryLS1zukyPmMEOpLHbEQ9A==","pic":"./img/cover.webp","type":"video"}');
         //queryMsg('sendMedia||maki||{"name":"./1.mp4","ablum":"","artist":"","url":"./video/playlist.m3u8","pic":"./img/cover.webp","sub":"http://127.0.0.1/listen-toggle/1.vtt","type":"video"}');
         // 解析网址参数json
+        //queryMsg(`sendMedia||maki||{"name":"8年越しの花嫁","ablum":"","artist":"","url":"https://vod.bunediy.com/20200506/hfQKre1o/index.m3u8","pic":"http://g.udn.com.tw/upfiles/B_IA/iamcamellia/PSN_PHOTO/385/f_23715385_1.jpg","sub":"","type":"video"}`)
         if (a_get['data']) {
             parseMusic(JSON.parse(a_get['data']));
         }
@@ -391,7 +394,41 @@ function loadedHandler() {
              $('#input_danmu').remove();
          }
      });*/
+
+     $('.dplayer-icons.dplayer-icons-right').prepend(`
+        <div class="dplayer-comment" id='recorder_btn' onclick="switchRecord();">
+                    <button class="dplayer-icon dplayer-comment-icon">
+                        <span class="dplayer-icon-content"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32" style="width: 37px; height: 37px">
+              <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
+              <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0v5zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3z"/>
+            </svg></span>
+                    </button>
+                </div>
+                <div class="dplayer-comment" id="recorder_cnt" style="display: none" title="秒数">
+                    <span style="color: white;">0s</span>
+                </div>
+                <div class="dplayer-comment" style="display: none" id='recorder_play_btn' onclick="document.querySelector('#record1').play();" title="再生">
+                    <button class="dplayer-icon dplayer-comment-icon">
+                        <span class="dplayer-icon-content">
+                        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32" style="width: 37px; height: 37px">
+  <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>
+</svg></span>
+                    </button>
+                </div>
+                <div class="dplayer-comment" style="display: none" id='recorder_play_send' onclick="sendRecord();" title="送信">
+                    <button class="dplayer-icon dplayer-comment-icon">
+                        <span class="dplayer-icon-content">
+                        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32" style="width: 37px; height: 37px">
+  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+  <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+</svg></span>
+                    </button>
+                </div>
+                `);
+
 }
+
+
 
 function loadVideo(url, poster = '', sub = '') {
     if (!poster) poster = '.img/loading.gif';

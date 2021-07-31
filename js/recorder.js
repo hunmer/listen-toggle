@@ -24,6 +24,15 @@ function startClicking(event) {
     }, 500);
 }
 
+function sendRecord(){
+  var reader = new FileReader();
+    reader.readAsDataURL(chunks[0]);
+    reader.onloadend = function() {
+        queryMsg('voice||' + g_config.user + '||' + reader.result);
+    }
+    $('#recorder_play_btn,#recorder_play_send,#recorder_cnt').hide();
+}
+
 function stopClicking(event) {
     console.log('stop');
     if (g_click.task != -1) {
@@ -39,28 +48,55 @@ function stopClicking(event) {
     g_click.holding = false;
 }
 
+
 function startRecord() {
   chunks = [];
-  $('#ftb').addClass('btn-danger').find('.bi-mic').hide();
-  $('#ftb').find('.bi-mic-fill').show();
+  if(_video.fullScreen.isFullScreen() == undefined){
+    $('#ftb').addClass('btn-danger').find('.bi-mic').hide();
+    $('#ftb').find('.bi-mic-fill').show();
+  }else{
+    $('#recorder_btn').addClass('btn-primary');
+    $('#recorder_cnt').show().find('span').html('0');
+
+  }
     g_click.startRecord = getNow();
     mediaRecorder.start();
     console.log("录音中...");
     soundTip('./res/di.mp3');
 
     g_click.recordTimer = setInterval(() => {
-        $('#ftb .badge').html(getNow() - g_click.startRecord);
+      var s = getNow() - g_click.startRecord;
+      if(_video.fullScreen.isFullScreen() == undefined){
+        $('#ftb .badge').html(s);
+      }else{
+        $('#recorder_cnt span').html(s);
+      }
     }, 1000);
 }
 
 function stopRecord() {
   clearInterval( g_click.recordTimer);
-  $('#ftb').removeClass('btn-danger').find('.bi-mic').show();
-  $('#ftb').find('.bi-mic-fill').hide();
-  $('#ftb .badge').html('');
+  if(_video.fullScreen.isFullScreen() == undefined){
+
+    $('#ftb').removeClass('btn-danger').find('.bi-mic').show();
+    $('#ftb').find('.bi-mic-fill').hide();
+    $('#ftb .badge').html('');
+  }else{
+    $('#recorder_play_btn,#recorder_play_send').show();
+    $('#recorder_btn').removeClass('btn-primary');
+  }
     mediaRecorder.stop();
     console.log("录音结束");
 }
+
+function switchRecord(){
+  if (mediaRecorder.state !== "recording") {
+  startRecord();
+}else{
+  stopRecord();
+}
+}
+
 
 if (navigator.mediaDevices.getUserMedia) {
     var chunks = [];
@@ -111,31 +147,32 @@ if (navigator.mediaDevices.getUserMedia) {
 
                 var audioURL = window.URL.createObjectURL(blob);
                 document.querySelector("#record1").src = audioURL;
-                x0p({
-                    title: '録音確認',
-                    html: true,
-                    text: '<audio id="record" src="' + audioURL + '" controls autoplay></audio>',
-                    animationType: 'slideDown',
-                    icon: 'info',
-                    maxWidth: '500px',
-                    buttons: [{
-                            type: 'cancel',
-                            text: 'キャンセル',
-                        },
-                        {
-                            type: 'info',
-                            text: '送信',
-                        }
-                    ]
-                }).then(function(data) {
-                    if (data.button == 'info') {
-                        var reader = new FileReader();
-                        reader.readAsDataURL(chunks[0]);
-                        reader.onloadend = function() {
-                            queryMsg('voice||' + g_config.user + '||' + reader.result);
-                        }
-                    }
-                });
+                if(_video.fullScreen.isFullScreen() == undefined){
+                  x0p({
+                      title: '録音確認',
+                      html: true,
+                      text: '<audio id="record" src="' + audioURL + '" controls autoplay></audio>',
+                      animationType: 'slideDown',
+                      icon: 'info',
+                      maxWidth: '500px',
+                      buttons: [{
+                              type: 'cancel',
+                              text: 'キャンセル',
+                          },
+                          {
+                              type: 'info',
+                              text: '送信',
+                          }
+                      ]
+                  }).then(function(data) {
+                      if (data.button == 'info') {
+                          sendRecord();
+                      }
+                  });
+                }else{
+                  console.log('11');
+                }
+                
             };
         },
         () => {
