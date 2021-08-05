@@ -176,9 +176,9 @@ if (navigator.mediaDevices.getUserMedia) {
             };
         },
         () => {
-            alert("授权失败！");
+          //  alert("授权失败！");
         }
     );
 } else {
-    alert("浏览器不支持 getUserMedia");
+   // alert("浏览器不支持 getUserMedia");
 }

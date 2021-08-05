@@ -1,6 +1,6 @@
-// var socket_url = 'ws://192.168.1.3:8000';
 // var api_url = '.';
 var socket_url = 'wss://listen-toggle-websocket.glitch.me';
+// var socket_url = 'ws://192.168.1.3:8000';
 var api_url = 'https://listen-toggle.glitch.me';
 var connection;
 var g_listPlayer = {};
@@ -22,7 +22,7 @@ $(function() {
     if (!g_config.user) {
         $('#modal_user').modal('show');
     } else {
-        
+
         setUser(g_config.user);
     }
 });
@@ -34,30 +34,7 @@ function queryMsg(msg, debug = false) {
 }
 
 function recon() {
-    x0p({
-    title: 'Async Operation',
-    text: 'サーバー接続に失敗しました！ 再接続しましたか？',
-    icon: 'info',
-    animationType: 'fadeIn',
-    buttons: [
-        {
-            type: 'cancel',
-            text: 'いいえ',
-        },
-        {
-            type: 'info',
-            text: 'はい',
-            showLoading: true
-        }
-    ]
-}).then(function(data) {
-    if(data.button == 'info') {
-        // Simulate Delay
-        setTimeout(function() {
-            window.location.reload();
-        }, 1000);
-    }
-});
+    initWebsock();
 }
 
 function checkOnline() {
@@ -79,15 +56,16 @@ var last_lrctime;
 var last_pro;
 var checkPlayerTimer;
 var g_b_inited = false;
-
-function init() {
-    if (g_b_inited) return;
-    g_b_inited = true;
-    _audio2 = $('#audio_tip')[0];
-
+var g_b_connected = false;
+function initWebsock() {
+    if (connection != undefined) {
+        connection.close();
+    }
     connection = new WebSocket(socket_url);
     connection.onopen = () => {
-        queryMsg('broadcast||login||' + g_config.user);
+    	queryMsg('broadcast||'+(g_b_connected ? 'recon' : 'login')+'||' + g_config.user);
+    	if(g_b_connected) return;
+    		g_b_connected = true;
 
         //hsycms.hideLoading();
         x0p({
@@ -107,12 +85,6 @@ function init() {
         }, 5000);
         queryMsg('list');
         checkOnline();
-
-        // queryMsg('sendMedia||maki||{"name":"グランドイリュージョン","ablum":"","artist":"","url":"https://s750.clipwatching.com/hls/zx5xsntp4f2txcne4y5clgp23jjjuem22527btq55cxxiku6qx6y2as3pgjq/index-v1-a1.m3u8","pic":"https://easy-movie.com/wp-content/uploads/2019/07/IMG_2581.jpg","type":"video"}');
-        //queryMsg('sendMedia||maki||{"name":"https://r2---sn-q0c7rn76.googlevideo.com/videoplayback?expire=1619803006&ei=HueLYNj7HqXTxN8P-96JqAM&ip=52.51.105.239&id=o-AHGpziR1rretMycb2ACSRLzMQ6Fxf5jf3wtENteLbuzA&itag=18&source=youtube&requiressl=yes&mh=3H&mm=31%2C26&mn=sn-q0c7rn76%2Csn-5hne6nsk&ms=au%2Conr&mv=m&mvi=2&pl=18&initcwndbps=1085000&vprv=1&mime=video%2Fmp4&ns=PLrzztOjosVZM0Npf1vzLuYF&gir=yes&clen=16997447&ratebypass=yes&dur=333.159&lmt=1598095846489687&mt=1619781165&fvip=2&fexp=24001373%2C24007246&beids=23886210&c=WEB&txp=5531432&n=gK-9CNO-2K_bF2c&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cvprv%2Cmime%2Cns%2Cgir%2Cclen%2Cratebypass%2Cdur%2Clmt&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=AG3C_xAwRQIgYfnWGwI_jckobmrdKp32oakTKs3QWUDe7_l3K5YKpnMCIQC-gihxGRv_OHQsFB7NOdVtwIywHPzrgW0TLVjLB7s0JQ%3D%3D&sig=AOq0QJ8wRQIhAKyepGXEOmG024yGJ3hIlIXZ7PdxgbZLprAklwZ18lLfAiApWK7ZZOoifbCu5HOBE-r2ryLS1zukyPmMEOpLHbEQ9A==","ablum":"","artist":"","url":"https://r2---sn-q0c7rn76.googlevideo.com/videoplayback?expire=1619803006&ei=HueLYNj7HqXTxN8P-96JqAM&ip=52.51.105.239&id=o-AHGpziR1rretMycb2ACSRLzMQ6Fxf5jf3wtENteLbuzA&itag=18&source=youtube&requiressl=yes&mh=3H&mm=31%2C26&mn=sn-q0c7rn76%2Csn-5hne6nsk&ms=au%2Conr&mv=m&mvi=2&pl=18&initcwndbps=1085000&vprv=1&mime=video%2Fmp4&ns=PLrzztOjosVZM0Npf1vzLuYF&gir=yes&clen=16997447&ratebypass=yes&dur=333.159&lmt=1598095846489687&mt=1619781165&fvip=2&fexp=24001373%2C24007246&beids=23886210&c=WEB&txp=5531432&n=gK-9CNO-2K_bF2c&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cvprv%2Cmime%2Cns%2Cgir%2Cclen%2Cratebypass%2Cdur%2Clmt&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=AG3C_xAwRQIgYfnWGwI_jckobmrdKp32oakTKs3QWUDe7_l3K5YKpnMCIQC-gihxGRv_OHQsFB7NOdVtwIywHPzrgW0TLVjLB7s0JQ%3D%3D&sig=AOq0QJ8wRQIhAKyepGXEOmG024yGJ3hIlIXZ7PdxgbZLprAklwZ18lLfAiApWK7ZZOoifbCu5HOBE-r2ryLS1zukyPmMEOpLHbEQ9A==","pic":"./img/cover.webp","type":"video"}');
-        //queryMsg('sendMedia||maki||{"name":"./1.mp4","ablum":"","artist":"","url":"./video/playlist.m3u8","pic":"./img/cover.webp","sub":"http://127.0.0.1/listen-toggle/1.vtt","type":"video"}');
-        // 解析网址参数json
-        //queryMsg(`sendMedia||maki||{"name":"8年越しの花嫁","ablum":"","artist":"","url":"https://vod.bunediy.com/20200506/hfQKre1o/index.m3u8","pic":"http://g.udn.com.tw/upfiles/B_IA/iamcamellia/PSN_PHOTO/385/f_23715385_1.jpg","sub":"","type":"video"}`)
         if (a_get['data']) {
             parseMusic(JSON.parse(a_get['data']));
         }
@@ -131,7 +103,8 @@ function init() {
         var params = e.data.split('||');
         switch (params[0]) {
             case 'voice':
-                dom_addMsg(params[1], '<audio id="record" src="'+params[2]+'" controls autoplay></audio>');
+                dom_addMsg(params[1], '<audio id="record" src="' + params[2] + '" onload="this.volume = 1;_video.video.volume = 0.25;" onended="_video.video.volume = 1;" controls autoplay></audio>');
+                console.log('<audio id="record" src="' + params[2] + '" ontimeupdate="this.volume = 1;_video.video.volume = 0.2;" onended="_video.video.volume = 1;" controls autoplay></audio>');
                 break;
             case 'msg':
                 dom_addMsg(params[1], params[2]);
@@ -198,6 +171,14 @@ function init() {
                 break;
         }
     }
+}
+
+function init() {
+    if (g_b_inited) return;
+    g_b_inited = true;
+    _audio2 = $('#audio_tip')[0];
+
+    initWebsock();
 
 
     _audio = $('audio')[0];
@@ -228,6 +209,8 @@ function init() {
             }
         }
     }
+
+
     _audio.onload = (e) => {
         if (g_playing.target) {
             console.log('调整到 ' + g_playing.target);
@@ -342,7 +325,7 @@ function loadedHandler() {
     });
     $(player).on('canplay', () => {
         queryMsg('status||' + g_config.user + '||ok||bg-success');
-       
+
     });
     player.on('loadstart', () => {
         queryMsg('status||' + g_config.user + '||ok||bg-success');
@@ -366,9 +349,9 @@ function loadedHandler() {
         }
     }
 
-     setInterval(() => {
-        	if (g_b_sub) {
-        		var current = _video.video.currentTime;
+    setInterval(() => {
+        if (g_b_sub) {
+            var current = _video.video.currentTime;
             var find = false;
             for (var sub of g_subs) {
                 if (current >= sub['start'] && current < sub['end']) {
@@ -385,7 +368,7 @@ function loadedHandler() {
                 $('.dplayer-subtitle p').hide();
             }
         }
-      }, 250);
+    }, 250);
 
     /*  _video.on('full', (b) => {
          if(b){ // 全屏显示弹幕输入控件
@@ -395,7 +378,7 @@ function loadedHandler() {
          }
      });*/
 
-     $('.dplayer-icons.dplayer-icons-right').prepend(`
+    $('.dplayer-icons.dplayer-icons-right').prepend(`
         <div class="dplayer-comment" id='recorder_btn' onclick="switchRecord();">
                     <button class="dplayer-icon dplayer-comment-icon">
                         <span class="dplayer-icon-content"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32" style="width: 37px; height: 37px">
@@ -467,35 +450,35 @@ function loadVideo(url, poster = '', sub = '') {
             url: sub,
             contentType: "application/x-www-form-urlencoded; charset=UTF-8",
             success: function(data) {
-            	console.log(data);
-                    g_subs = [];
-                    var arr = data.split("\n");
-                    console.log(arr);
-                    if (arr[0].toLocaleUpperCase().indexOf('WEBVTT') == 0) {
-                        var data = [];
-                        for (var line of arr) {
-                            line = line.trim();
-                            if (line != '') {
-                                if (line.indexOf(' --> ') != -1) {
-                                    if (data['text'] != undefined) {
-                                        g_subs.push(data);
-                                        data = { 'text': '' };
-                                    }
-                                    time = line.split(' --> ');
-                                    if (time.length == 2) {
-                                        data['start'] = toTime(time[0]);
-                                        data['end'] = toTime(time[1]);
-
-                                    }
-                                } else {
-                                    data['text'] += (data['text'] != '' ? '\r\n' : '') + line;
+                console.log(data);
+                g_subs = [];
+                var arr = data.split("\n");
+                console.log(arr);
+                if (arr[0].toLocaleUpperCase().indexOf('WEBVTT') == 0) {
+                    var data = [];
+                    for (var line of arr) {
+                        line = line.trim();
+                        if (line != '') {
+                            if (line.indexOf(' --> ') != -1) {
+                                if (data['text'] != undefined) {
+                                    g_subs.push(data);
+                                    data = { 'text': '' };
                                 }
+                                time = line.split(' --> ');
+                                if (time.length == 2) {
+                                    data['start'] = toTime(time[0]);
+                                    data['end'] = toTime(time[1]);
+
+                                }
+                            } else {
+                                data['text'] += (data['text'] != '' ? '\r\n' : '') + line;
                             }
                         }
-                        if (data['text'] != undefined) {
-                            g_subs.push(data);
-                        }
                     }
+                    if (data['text'] != undefined) {
+                        g_subs.push(data);
+                    }
+                }
                 g_b_sub = g_subs.length;
                 if (!$('.dplayer-subtitle p').length) {
                     $('.dplayer-subtitle').css({
