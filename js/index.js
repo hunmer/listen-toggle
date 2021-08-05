@@ -63,7 +63,7 @@ function initWebsock() {
     }
     connection = new WebSocket(socket_url);
     connection.onopen = () => {
-    	queryMsg('broadcast||'+(g_b_connected ? 'recon' : 'login')+'||' + g_config.user);
+    	queryMsg('broadcast||login||' + g_config.user+(g_b_connected ? '||recon' : ''));
     	if(g_b_connected) return;
     		g_b_connected = true;
 
@@ -135,6 +135,7 @@ function initWebsock() {
                 var html;
                 switch (params[1]) {
                     case 'login':
+                    	if(params.length == 4) return;
                         html = '<span class="msg badge text-center text-light mb-2"><span class="bg-dark p-2">[' + params[2] + '] チャットルームに参加しました。</span></span>';
                         queryMsg('status||' + params[2] + '||online||bg-primary');
                         break;
