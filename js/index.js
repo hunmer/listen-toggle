@@ -484,7 +484,7 @@ function loadVideo(url, poster = '', sub = '') {
                 if (!$('.dplayer-subtitle p').length) {
                     $('.dplayer-subtitle').css({
                         height: '17%',
-                        fontSize: '18px',
+                        fontSize: '2rem',
                         minHeight: '50px',
                         bottom: '0',
                         color: 'rgb(183, 218, 255)',
