@@ -57,7 +57,9 @@ var last_pro;
 var checkPlayerTimer;
 var g_b_inited = false;
 var g_b_connected = false;
+initWebsock();
 function initWebsock() {
+    console.log('init');
     if (connection != undefined) {
         connection.close();
     }
