@@ -11,6 +11,7 @@ var g_playing = {
     }
 };
 $(function() {
+    // initWebsock();
     x0p({
         title: 'loading',
         text: '読み込み中...',
@@ -57,7 +58,6 @@ var last_pro;
 var checkPlayerTimer;
 var g_b_inited = false;
 var g_b_connected = false;
-initWebsock();
 function initWebsock() {
     console.log('init');
     if (connection != undefined) {
