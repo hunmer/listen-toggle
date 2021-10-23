@@ -449,14 +449,23 @@ function loadVideo(url, poster = '', sub = '') {
     }
 
     if (sub) {
-        $.ajax({
+        loadSub(sub);
+    }
+    if (!_video || _video.isVideo) {
+        _video = new DPlayer(config);
+        loadedHandler();
+    } else {
+        _video.switchVideo(config.video);
+    }
+}
+
+function loadSub(sub){
+    $.ajax({
             url: sub,
             contentType: "application/x-www-form-urlencoded; charset=UTF-8",
             success: function(data) {
-                console.log(data);
                 g_subs = [];
                 var arr = data.split("\n");
-                console.log(arr);
                 if (arr[0].toLocaleUpperCase().indexOf('WEBVTT') == 0) {
                     var data = [];
                     for (var line of arr) {
@@ -494,16 +503,9 @@ function loadVideo(url, poster = '', sub = '') {
                 }
             },
             error: function(request, status, error) {
-                BRICK.ajaxError(request, status, error);
+                console.log('加载字幕失败');
             }
         })
-    }
-    if (!_video || _video.isVideo) {
-        _video = new DPlayer(config);
-        loadedHandler();
-    } else {
-        _video.switchVideo(config.video);
-    }
 }
 
 var g_subs = [];
