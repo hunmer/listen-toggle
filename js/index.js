@@ -356,19 +356,22 @@ function loadedHandler() {
         if (g_b_sub) {
             var current = _video.video.currentTime;
             var find = false;
+            var res = [];
             for (var sub of g_subs) {
                 if (current >= sub['start'] && current < sub['end']) {
                     find = true;
                     if (g_sub_last != sub.text) {
                         g_sub_last = sub.text;
+                        res.push(sub.text);
                         // console.log(sub.text);
-                        $('.dplayer-subtitle p').show().html(sub.text);
                     }
                 }
 
             }
             if (!find) {
                 $('.dplayer-subtitle p').hide();
+            }else{
+                if(res.length) $('.dplayer-subtitle p').show().html(res.join("</br>"));
             }
         }
     }, 250);
@@ -459,12 +462,12 @@ function loadVideo(url, poster = '', sub = '') {
     }
 }
 
-function loadSub(sub){
+function loadSub(sub, reset = true){
     $.ajax({
             url: sub,
             contentType: "application/x-www-form-urlencoded; charset=UTF-8",
             success: function(data) {
-                g_subs = [];
+                if(reset) g_subs = [];
                 var arr = data.split("\n");
                 if (arr[0].toLocaleUpperCase().indexOf('WEBVTT') == 0) {
                     var data = [];
@@ -520,7 +523,7 @@ function shareLink() {
         cover = id ? 'https://i.ytimg.com/an_webp/' + id + '/mqdefault_6s.webp' : './img/cover.webp';
     }
     var data = {
-        name: name ? name : url,
+        name: name || 'no title',
         ablum: $('#input_album').val(),
         artist: $('#input_artist').val(),
         url: ($('#share_select')[0].selectedIndex == 0 ? 'https://alltubedownload.net/download?url=' : '') + url,
