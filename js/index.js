@@ -12,14 +12,7 @@ var g_playing = {
 };
 $(function() {
     // initWebsock();
-    x0p({
-        title: 'loading',
-        text: '読み込み中...',
-        animationType: 'slideDown',
-        icon: 'info',
-        buttons: [],
-        autoClose: 999999
-    });
+    
     if (!g_config.user) {
         $('#modal_user').modal('show');
     } else {
@@ -179,6 +172,15 @@ function initWebsock() {
 function init() {
     if (g_b_inited) return;
     g_b_inited = true;
+    x0p({
+        title: 'loading',
+        text: '読み込み中...',
+        animationType: 'slideDown',
+        icon: 'info',
+        buttons: [],
+        autoClose: 999999
+    });
+
     _audio2 = $('#audio_tip')[0];
 
     initWebsock();
@@ -371,7 +373,7 @@ function loadedHandler() {
             if (!find) {
                 $('.dplayer-subtitle p').hide();
             }else{
-                if(res.length) $('.dplayer-subtitle p').show().html(res.join("</br>"));
+                if(res.length) $('.dplayer-subtitle p').show().html(res.join("<br>").replaceAll('\r\n', '<br>').replaceAll('\n', '<br>'));
             }
         }
     }, 250);
@@ -468,7 +470,7 @@ function loadSub(sub, reset = true){
             contentType: "application/x-www-form-urlencoded; charset=UTF-8",
             success: function(data) {
                 if(reset) g_subs = [];
-                var arr = data.split("\n");
+                var arr = data.replaceAll("</br>", "\n").replaceAll("\r\n", "\n").split("\n");
                 if (arr[0].toLocaleUpperCase().indexOf('WEBVTT') == 0) {
                     var data = [];
                     for (var line of arr) {
